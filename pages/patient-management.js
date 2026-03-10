@@ -6,6 +6,7 @@ export default function ServiceUserManagement() {
   const [serviceUsers, setServiceUsers] = useState([
     { 
       id: 1, 
+      title: 'Mr',
       firstName: 'James',
       lastName: 'Miller',
       name: 'James H. Miller', // Kept for backward compatibility with list view
@@ -57,15 +58,31 @@ export default function ServiceUserManagement() {
         chokingRisk: false
       },
       legal: {
-        dnacpr: true
+        dnacpr: true,
+        respecStatus: 'In place',
+        dnacprLocation: 'On file in office',
+        respecLocation: 'On file in office'
       },
       environment: {
         accessCode: '4590',
         keySafeLocation: 'Side door',
-        hazards: ['Stairs', 'Loose rugs']
+        hazards: ['Stairs', 'Loose rugs'],
+        lifeline: 'Yes, pendant worn at all times',
+        pets: '1 Golden Retriever (Buddy)'
       },
       social: {
-        lifeStory: 'Retired school teacher. Widowed in 2018. Enjoys reading history books.',
+        lifeStory: `Hello my name is Jim, I live alone in a bungalow.
+
+I have a private carer (family friend) called Sarah, she attends each morning and sometimes on the evening.
+
+I have COPD and may need somethings explaining to me but otherwise I can make my own choices around my current care needs.
+
+I have Osteoporosis and this has caused T7, T11 and L2 osteoporotic fractures. This causes me to be in a lot of pain and I struggle to get comfortable. I struggle to mobilise more in the morning then I do for the rest of the day.
+
+I like to have a jug of juice and a glass next to my rise and recline chair in the lounge for through out the day.
+I love a cup of tea or coffee on each visit (maybe even two..).
+
+I would like my carers to provide meal support on each visit. I would like these at lunch time, served onto a plate and on the tray - I will eat this in the lounge in my chair.`,
         hobbies: ['Reading', 'Gardening', 'Classical Music']
       },
       preferences: {
@@ -77,6 +94,7 @@ export default function ServiceUserManagement() {
       status: 'Active',
       group: 'Floor 1',
       groups: ['Floor 1'],
+      nextOfKin: 'Sarah Miller (Daughter) - (555) 999-8888',
       careNotes: [],
       tasks: [],
       documents: [],

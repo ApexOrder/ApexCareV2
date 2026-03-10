@@ -30,6 +30,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
 
   // Local state for editing identity information
   const [editIdentity, setEditIdentity] = useState({
+    title: client.title || '',
     firstName: client.firstName || '',
     lastName: client.lastName || '',
     preferredName: client.preferredName || '',
@@ -42,6 +43,11 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
     auditStatus: client.auditStatus || 'Compliant',
     careLevel: client.careLevel || 'Low',
     pronouns: client.pronouns || '',
+    gender: client.gender || '',
+    sexuality: client.sexuality || '',
+    ethnicity: client.ethnicity || '',
+    religion: client.religion || '',
+    languages: client.languages || '',
     serviceStartDate: client.serviceStartDate || '',
     ageBand: client.ageBand || '',
     regulatedCare: client.regulatedCare || '',
@@ -111,12 +117,17 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
   // Local state for editing care details
   const [isEditingCare, setIsEditingCare] = useState(false);
   const [editCare, setEditCare] = useState({
+    emergencyContact: client.emergencyContact || '',
+    nextOfKin: client.nextOfKin || '',
     allergies: client.allergies ? client.allergies.join(', ') : '',
     mobilityLevel: client.mobility?.level || 'Independent',
     dietaryType: client.nutrition?.dietaryType || 'Regular',
     fluidConsistency: client.nutrition?.preferences?.match(/Fluids: (.*?)\./)?.[1] || 'Level 0 - Thin',
     nutritionPreferences: client.nutrition?.preferences || '',
     dnacpr: client.legal?.dnacpr || false,
+    dnacprLocation: client.legal?.dnacprLocation || '',
+    respecStatus: client.legal?.respecStatus || 'Not in place',
+    respecLocation: client.legal?.respecLocation || '',
     needsFluidMonitoring: client.needsFluidMonitoring || false,
     accessCode: client.environment?.accessCode || '',
     keySafeLocation: client.environment?.keySafeLocation || '',
@@ -139,6 +150,27 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
     riskOfFalls: client.mobility?.riskOfFalls || 'Low',
     chokingRisk: client.nutrition?.chokingRisk || false,
     hazards: client.environment?.hazards ? client.environment.hazards.join(', ') : ''
+  });
+
+  // Local state for editing home environment
+  const [isEditingHome, setIsEditingHome] = useState(false);
+  const [editHome, setEditHome] = useState({
+    equipment: client.environment?.equipment ? client.environment.equipment.join(', ') : '',
+    pets: client.environment?.pets || '',
+    lifeline: client.environment?.lifeline || '',
+    binDay: client.environment?.binDay || '',
+    fuseBoxLocation: client.environment?.fuseBoxLocation || '',
+    stopcockLocation: client.environment?.stopcockLocation || ''
+  });
+
+  // Local state for editing care plan
+  const [isEditingCarePlan, setIsEditingCarePlan] = useState(false);
+  const [editCarePlan, setEditCarePlan] = useState({
+    morning: client.carePlan?.morning || '',
+    lunch: client.carePlan?.lunch || '',
+    tea: client.carePlan?.tea || '',
+    evening: client.carePlan?.evening || '',
+    night: client.carePlan?.night || ''
   });
 
   // Calculate CQC Status based on profile completeness
@@ -174,9 +206,9 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
   const [isFinanceDirty, setIsFinanceDirty] = useState(false);
 
   useEffect(() => {
-    const isDirty = isEditingInfo || isEditingIdentity || isEditingAddress || isEditingCare || isEditingRisk || isAddingNote || isFinanceDirty;
+    const isDirty = isEditingInfo || isEditingIdentity || isEditingAddress || isEditingCare || isEditingRisk || isAddingNote || isFinanceDirty || isEditingHome || isEditingCarePlan;
     onDirtyStateChange?.(isDirty);
-  }, [isEditingInfo, isEditingIdentity, isEditingAddress, isEditingCare, isEditingRisk, isAddingNote, isFinanceDirty, onDirtyStateChange]);
+  }, [isEditingInfo, isEditingIdentity, isEditingAddress, isEditingCare, isEditingRisk, isAddingNote, isFinanceDirty, isEditingHome, isEditingCarePlan, onDirtyStateChange]);
 
   // Tasks state
   const [tasks, setTasks] = useState(client.tasks || []);
@@ -568,12 +600,18 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
       onConfirm: () => {
         const changes = [];
         const fields = [
+          { key: 'title', label: 'Title' },
           { key: 'firstName', label: 'First Name' }, { key: 'lastName', label: 'Last Name' },
           { key: 'preferredName', label: 'Preferred Name' }, { key: 'nhsNumber', label: 'NHS Number' },
           { key: 'pidNumber', label: 'Local Authority ID' }, { key: 'dob', label: 'Date of Birth' },
           { key: 'phone', label: 'Phone' }, { key: 'email', label: 'Email' }, { key: 'area', label: 'Area' },
           { key: 'auditStatus', label: 'Audit Status' }, { key: 'careLevel', label: 'Service Level' },
           { key: 'pronouns', label: 'Pronouns' },
+          { key: 'gender', label: 'Gender' },
+          { key: 'sexuality', label: 'Sexual Orientation' },
+          { key: 'ethnicity', label: 'Ethnicity' },
+          { key: 'religion', label: 'Religion' },
+          { key: 'languages', label: 'Languages' },
           { key: 'serviceStartDate', label: 'Service Start Date' },
           { key: 'ageBand', label: 'Age Band' },
           { key: 'regulatedCare', label: 'Regulated Care' },
@@ -666,13 +704,15 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
       onConfirm: () => {
         onUpdateClient({
           ...client,
+          emergencyContact: editCare.emergencyContact,
+          nextOfKin: editCare.nextOfKin,
           arrivalNote: editCare.arrivalNote,
           bigThing: editCare.bigThing,
           needsFluidMonitoring: editCare.needsFluidMonitoring,
           allergies: editCare.allergies.split(',').map(s => s.trim()).filter(s => s !== ''),
           mobility: { ...client.mobility, level: editCare.mobilityLevel },
           nutrition: { ...client.nutrition, dietaryType: editCare.dietaryType, preferences: editCare.nutritionPreferences },
-          legal: { ...client.legal, dnacpr: editCare.dnacpr },
+          legal: { ...client.legal, dnacpr: editCare.dnacpr, respecStatus: editCare.respecStatus, dnacprLocation: editCare.dnacprLocation, respecLocation: editCare.respecLocation },
           environment: { ...client.environment, accessCode: editCare.accessCode, keySafeLocation: editCare.keySafeLocation },
           preferences: { ...client.preferences, carerGender: editCare.carerGender, carerVibe: editCare.carerVibe },
           gp: { ...client.gp, name: editCare.gpName, surgery: editCare.gpSurgery, phone: editCare.gpPhone, address: editCare.gpAddress },
@@ -706,6 +746,56 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
           }, ...(client.editHistory || [])]
         });
         setIsEditingRisk(false);
+      }
+    });
+  };
+
+  const handleUpdateHome = () => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Save Home Environment?',
+      message: 'Are you sure you want to update the home environment details?',
+      onConfirm: () => {
+        onUpdateClient({
+          ...client,
+          environment: {
+            ...client.environment,
+            equipment: editHome.equipment.split(',').map(s => s.trim()).filter(s => s !== ''),
+            lifeline: editHome.lifeline,
+            pets: editHome.pets,
+            binDay: editHome.binDay,
+            fuseBoxLocation: editHome.fuseBoxLocation,
+            stopcockLocation: editHome.stopcockLocation
+          },
+          editHistory: [{
+             id: `h-${Date.now()}`, date: new Date().toISOString(), author: 'Leon Lowden (Admin)', changes: ['Updated Home Environment']
+          }, ...(client.editHistory || [])]
+        });
+        setIsEditingHome(false);
+      }
+    });
+  };
+
+  const handleUpdateCarePlan = () => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Save Care Plan?',
+      message: 'Are you sure you want to update the daily care plan routines?',
+      onConfirm: () => {
+        onUpdateClient({
+          ...client,
+          carePlan: {
+            morning: editCarePlan.morning,
+            lunch: editCarePlan.lunch,
+            tea: editCarePlan.tea,
+            evening: editCarePlan.evening,
+            night: editCarePlan.night
+          },
+          editHistory: [{
+             id: `h-${Date.now()}`, date: new Date().toISOString(), author: 'Leon Lowden (Admin)', changes: ['Updated Care Plan Routines']
+          }, ...(client.editHistory || [])]
+        });
+        setIsEditingCarePlan(false);
       }
     });
   };
@@ -902,7 +992,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                {/* SNAPSHOT WIDGETS */}
                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {/* Next Visit with Scheduled Carer */}
-                  <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm relative overflow-hidden group">
+                  <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl relative overflow-hidden group" style={{ borderTop: '6px solid #3b82f6' }}>
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                       <span className="text-4xl">🚐</span>
                     </div>
@@ -918,7 +1008,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                   </div>
 
                   {/* Wellbeing Insight */}
-                  <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                  <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl" style={{ borderTop: '6px solid #10b981' }}>
                     <p className="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Wellbeing Score</p>
                     <div className="flex items-end gap-3">
                       <p className={`text-5xl font-black ${client.wellbeingScore > 80 ? 'text-emerald-600' : 'text-amber-600'}`}>{client.wellbeingScore}%</p>
@@ -932,7 +1022,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                   </div>
 
                   {/* Quick MAR Status */}
-                  <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                  <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl" style={{ borderTop: '6px solid #14b8a6' }}>
                     <p className="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Medication Status</p>
                     <div className="flex items-center gap-2">
                       <span className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
@@ -943,7 +1033,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                </div>
 
                {/* ARRIVAL INSTRUCTIONS & ALERT (Moved Above Identity) */}
-               <section className="bg-white border border-slate-200 text-slate-900 rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 shadow-2xl relative overflow-hidden">
+               <section className="bg-white border border-slate-200 text-slate-900 rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 shadow-2xl relative overflow-hidden" style={{ borderTop: '6px solid #f59e0b' }}>
                   <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full -mr-32 -mt-32"></div>
                   <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
                     <div className="space-y-6">
@@ -958,7 +1048,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                </section>
 
                {/* IDENTITY & PROFILE SUMMARY */}
-               <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+               <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden" style={{ borderTop: '6px solid #3b82f6' }}>
                   <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                      <h3 className="text-2xl font-black text-slate-900 tracking-tight">Identity & Profile Summary</h3>
                      <button onClick={() => setActiveSubTab('Client Information')} className="text-[10px] font-black text-blue-600 uppercase hover:underline">Full Details →</button>
@@ -988,7 +1078,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                </section>
 
                {/* QUICK PERSONAL PROFILE (PMH & Hobbies for Carers) */}
-               <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+               <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden" style={{ borderTop: '6px solid #6366f1' }}>
                   <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex justify-between items-center bg-emerald-50">
                      <h3 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-3">
                         Personal Snapshot <span className="text-sm font-bold text-emerald-600 bg-emerald-100 px-3 py-1 rounded-full uppercase">For Carers</span>
@@ -1022,16 +1112,38 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                   </div>
                </section>
 
-               {/* CLINICAL INTRODUCTION HIGHLIGHT */}
-               <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
-                  <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 bg-blue-50">
-                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">Clinical Introduction</h3>
+               {/* ABOUT ME / HIGHLIGHTS */}
+               <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden" style={{ borderTop: '6px solid #8b5cf6' }}>
+                  <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">About {client.firstName}</h3>
                   </div>
                   <div className="p-6 md:p-10">
-                    <p className="text-xl font-bold text-slate-600 leading-relaxed italic border-l-4 border-blue-200 pl-8">
-                       "{client.social?.lifeStory}"
+                    <p className="text-slate-700 font-medium leading-relaxed whitespace-pre-wrap">
+                       {client.social?.lifeStory || 'No summary available.'}
                     </p>
                   </div>
+               </section>
+
+               {/* Care Plan & Daily Routine */}
+               <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden" style={{ borderTop: '6px solid #14b8a6' }}>
+                 <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                   <h3 className="text-2xl font-black text-slate-900 tracking-tight">Care Plan & Daily Routine</h3>
+                 </div>
+                 <div className="p-6 md:p-10 grid grid-cols-1 gap-8">
+                   {[
+                     { label: 'Morning Routine', key: 'morning' },
+                     { label: 'Lunch Routine', key: 'lunch' },
+                     { label: 'Tea / Evening Routine', key: 'tea' },
+                     { label: 'Night Routine', key: 'night' },
+                   ].map(item => (
+                     <div key={item.key}>
+                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.label}</label>
+                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 font-medium leading-relaxed mt-1 whitespace-pre-wrap">
+                          {client.carePlan?.[item.key] || 'No routine recorded.'}
+                        </div>
+                     </div>
+                   ))}
+                 </div>
                </section>
              </>
            )}
@@ -1039,7 +1151,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
            {activeSubTab === 'Client Information' && (
               <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4">
                 {/* Identity & Contact Records */}
-                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #3b82f6' }}>
                   <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">Identity & Contact Records</h3>
                     {userRole === 'admin' && (!isEditingIdentity ? (
@@ -1051,38 +1163,73 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                       </div>
                     ))}
                   </div>
-                  <div className="p-6 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="p-6 md:p-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-6 xl:gap-x-8">
                     {[
+                       { label: 'Title', value: client.title, key: 'title' },
                       { label: 'First Name', value: client.firstName, key: 'firstName' },
                       { label: 'Last Name', value: client.lastName, key: 'lastName' },
                       { label: 'Preferred Name', value: client.preferredName, key: 'preferredName' },
                       { label: 'Date of Birth', value: client.dob, key: 'dob', type: 'date' },
+                       
+                       { type: 'divider' },
+
+                      { label: 'Gender', value: client.gender, key: 'gender' },
                       { label: 'Pronouns', value: client.pronouns, key: 'pronouns' },
+                      { label: 'Sexual Orientation', value: client.sexuality, key: 'sexuality' },
+                      { label: 'Ethnicity', value: client.ethnicity, key: 'ethnicity' },
+                      { label: 'Religion', value: client.religion, key: 'religion' },
+                      { label: 'Languages', value: client.languages, key: 'languages' },
+
+                       { type: 'divider' },
+
                       { label: 'NHS Number', value: client.nhsNumber, key: 'nhsNumber' },
                       { label: 'Local Authority ID', value: client.pidNumber, key: 'pidNumber' },
+
+                       { type: 'divider' },
+
                       { label: 'Phone Number', value: client.phone, key: 'phone' },
                       { label: 'Email Address', value: client.email, key: 'email' },
+
+                       { type: 'divider' },
+
+                       { label: 'Service Start Date', value: client.serviceStartDate, key: 'serviceStartDate', type: 'date' },
+                       { label: 'Service Level', value: client.careLevel, key: 'careLevel' },
+                       { label: 'Area', value: client.area, key: 'area' },
                       { label: 'Group', value: client.group, key: 'group', type: 'select', options: availableGroups },
-                    ].map(item => (
-                      <div key={item.key} className={item.fullWidth ? 'md:col-span-3' : ''}>
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.label}</label>
-                        {isEditingIdentity ? (
-                          <input 
+                       { label: 'Regulated Care', value: client.regulatedCare, key: 'regulatedCare' },
+                       { label: 'Audit Status', value: client.auditStatus, key: 'auditStatus' },
+                     ].map((item, index) => {
+                       if (item.type === 'divider') {
+                         return <div key={`divider-${index}`} className="col-span-full h-px bg-slate-100"></div>;
+                       }
+                       return (
+                         <div key={item.key} className={item.fullWidth ? 'col-span-full' : ''}>
+                           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.label}</label>
+                           {isEditingIdentity ? (
+                             item.type === 'select' ? (
+                               <select value={editIdentity[item.key]} onChange={(e) => setEditIdentity({...editIdentity, [item.key]: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900">
+                                 <option value="">Not Assigned</option>
+                                 {item.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                               </select>
+                             ) : (
+                               <input 
                             type={item.type || 'text'}
                             value={editIdentity[item.key]}
                             onChange={(e) => setEditIdentity({...editIdentity, [item.key]: e.target.value})}
                             className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900"
                           />
-                        ) : (
-                          <p className="text-sm font-bold text-slate-900 mt-1">{item.value || 'Not Recorded'}</p>
-                        )}
-                      </div>
-                    ))}
+                             )
+                           ) : (
+                             <p className="text-sm font-bold text-slate-900 mt-1">{item.value || 'Not Recorded'}</p>
+                           )}
+                         </div>
+                       );
+                     })}
                   </div>
                 </section>
 
                 {/* Address & Location */}
-                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #3b82f6' }}>
                   <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">Address & Location</h3>
                     {userRole === 'admin' && (!isEditingAddress ? (
@@ -1219,8 +1366,202 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                   </div>
                 </section>
 
+                {/* Professional & Emergency Contacts */}
+                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #6366f1' }}>
+                  <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Professional & Emergency Contacts</h3>
+                    {userRole === 'admin' && (!isEditingCare ? (
+                      <button onClick={() => setIsEditingCare(true)} className="px-6 py-3 bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 transition-colors">Edit Contacts</button>
+                    ) : (
+                      <div className="flex gap-3">
+                        <button onClick={() => setIsEditingCare(false)} className="px-6 py-3 bg-slate-100 text-slate-500 text-[10px] font-black uppercase rounded-xl hover:bg-slate-200">Cancel</button>
+                        <button onClick={handleUpdateCare} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl shadow-lg shadow-emerald-200">Save Changes</button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="p-6 md:p-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8">
+                    {[
+                      { label: 'Emergency Contact', value: editCare.emergencyContact, key: 'emergencyContact', placeholder: 'Name & Number' },
+                      { label: 'Next of Kin', value: editCare.nextOfKin, key: 'nextOfKin', placeholder: 'Name, Relationship & Number' },
+                      { label: 'GP Name', value: editCare.gpName, key: 'gpName', placeholder: 'Dr. Name' },
+                      { label: 'GP Surgery', value: editCare.gpSurgery, key: 'gpSurgery', placeholder: 'Surgery Name' },
+                      { label: 'GP Phone', value: editCare.gpPhone, key: 'gpPhone', placeholder: 'Number' },
+                      { label: 'Pharmacy Name', value: editCare.pharmacyName, key: 'pharmacyName', placeholder: 'Pharmacy Name' },
+                      { label: 'Pharmacy Phone', value: editCare.pharmacyPhone, key: 'pharmacyPhone', placeholder: 'Number' },
+                    ].map(item => (
+                      <div key={item.key}>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.label}</label>
+                        {isEditingCare ? (
+                          <input 
+                            type="text"
+                            value={editCare[item.key]}
+                            onChange={(e) => setEditCare({...editCare, [item.key]: e.target.value})}
+                            placeholder={item.placeholder}
+                            className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900"
+                          />
+                        ) : (
+                          <p className="text-sm font-bold text-slate-900 mt-1">{client[item.key === 'emergencyContact' ? 'emergencyContact' : 'gp']?.[item.key === 'emergencyContact' ? 'toString' : item.key.replace('gp', '').toLowerCase()] || (item.key.includes('pharmacy') ? client.pharmacy?.[item.key.replace('pharmacy', '').toLowerCase()] : client[item.key]) || 'Not Recorded'}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Care & Safety Profile */}
+                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #f43f5e' }}>
+                  <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Care & Safety Profile</h3>
+                    {userRole === 'admin' && (!isEditingCare ? (
+                      <button onClick={() => setIsEditingCare(true)} className="px-6 py-3 bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 transition-colors">Edit Profile</button>
+                    ) : (
+                      <div className="flex gap-3">
+                        <button onClick={() => setIsEditingCare(false)} className="px-6 py-3 bg-slate-100 text-slate-500 text-[10px] font-black uppercase rounded-xl hover:bg-slate-200">Cancel</button>
+                        <button onClick={handleUpdateCare} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl shadow-lg shadow-emerald-200">Save Changes</button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="md:col-span-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Allergies</label>
+                        {isEditingCare ? (
+                          <input type="text" value={editCare.allergies} onChange={(e) => setEditCare({...editCare, allergies: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" placeholder="e.g. Penicillin, Latex" />
+                        ) : (
+                          <div className="flex flex-wrap gap-2 mt-2">{client.allergies && client.allergies.length > 0 ? client.allergies.map(a => <span key={a} className="px-3 py-1 bg-rose-50 text-rose-700 rounded-lg text-xs font-bold border border-rose-100">{a}</span>) : <span className="text-sm font-bold text-slate-400">NKDA</span>}</div>
+                        )}
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">DNACPR Status</label>
+                        {isEditingCare ? (
+                          <select value={editCare.dnacpr} onChange={(e) => setEditCare({...editCare, dnacpr: e.target.value === 'true'})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900"><option value="false">No - Attempt Resuscitation</option><option value="true">Yes - Do Not Attempt</option></select>
+                        ) : (
+                          <p className={`text-sm font-black mt-1 ${client.legal?.dnacpr ? 'text-rose-600' : 'text-emerald-600'}`}>{client.legal?.dnacpr ? 'DNACPR In Place' : 'Attempt Resuscitation'}</p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">DNACPR Form Location</label>
+                        {isEditingCare ? (
+                          <input type="text" value={editCare.dnacprLocation} onChange={(e) => setEditCare({...editCare, dnacprLocation: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" placeholder="e.g. On file in office" />
+                        ) : (
+                          <p className="text-sm font-bold text-slate-900 mt-1">{client.legal?.dnacprLocation || 'Not Recorded'}</p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">RESPEC Status</label>
+                        {isEditingCare ? (
+                          <select value={editCare.respecStatus} onChange={(e) => setEditCare({...editCare, respecStatus: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900">
+                            <option>Not in place</option>
+                            <option>In place</option>
+                            <option>For discussion</option>
+                          </select>
+                        ) : (
+                          <p className={`text-sm font-black mt-1 ${client.legal?.respecStatus === 'In place' ? 'text-rose-600' : 'text-slate-900'}`}>{client.legal?.respecStatus || 'Not in place'}</p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">RESPEC Form Location</label>
+                        {isEditingCare ? (
+                          <input type="text" value={editCare.respecLocation} onChange={(e) => setEditCare({...editCare, respecLocation: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" placeholder="e.g. With client" />
+                        ) : (
+                          <p className="text-sm font-bold text-slate-900 mt-1">{client.legal?.respecLocation || 'Not Recorded'}</p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Mobility Level</label>
+                        {isEditingCare ? (
+                          <input type="text" value={editCare.mobilityLevel} onChange={(e) => setEditCare({...editCare, mobilityLevel: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" />
+                        ) : (
+                          <p className="text-sm font-bold text-slate-900 mt-1">{client.mobility?.level || 'Not Recorded'}</p>
+                        )}
+                    </div>
+                  </div>
+                </section>
+
+                {/* Care Plan & Daily Routine */}
+                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #14b8a6' }}>
+                  <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Care Plan & Daily Routine</h3>
+                    {userRole === 'admin' && (!isEditingCarePlan ? (
+                      <button onClick={() => setIsEditingCarePlan(true)} className="px-6 py-3 bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 transition-colors">Edit Plan</button>
+                    ) : (
+                      <div className="flex gap-3">
+                        <button onClick={() => setIsEditingCarePlan(false)} className="px-6 py-3 bg-slate-100 text-slate-500 text-[10px] font-black uppercase rounded-xl hover:bg-slate-200">Cancel</button>
+                        <button onClick={handleUpdateCarePlan} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl shadow-lg shadow-emerald-200">Save Changes</button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="p-6 md:p-10 grid grid-cols-1 gap-8">
+                    {[
+                      { label: 'Morning Routine', key: 'morning', placeholder: 'e.g. Wake up, wash, dress, breakfast...' },
+                      { label: 'Lunch Routine', key: 'lunch', placeholder: 'e.g. Prepare lunch, medication prompt...' },
+                      { label: 'Tea / Evening Routine', key: 'tea', placeholder: 'e.g. Afternoon tea, check fluids...' },
+                      { label: 'Night Routine', key: 'night', placeholder: 'e.g. Prepare for bed, secure home...' },
+                    ].map(item => (
+                      <div key={item.key}>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.label}</label>
+                        {isEditingCarePlan ? (
+                          <textarea 
+                            rows={3}
+                            value={editCarePlan[item.key]}
+                            onChange={(e) => setEditCarePlan({...editCarePlan, [item.key]: e.target.value})}
+                            placeholder={item.placeholder}
+                            className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-900"
+                          />
+                        ) : (
+                          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 font-medium leading-relaxed mt-1 whitespace-pre-wrap">
+                            {client.carePlan?.[item.key] || 'No routine recorded.'}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Home Environment & Equipment */}
+                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #64748b' }}>
+                  <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Home Environment & Equipment</h3>
+                    {userRole === 'admin' && (!isEditingHome ? (
+                      <button onClick={() => setIsEditingHome(true)} className="px-6 py-3 bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 transition-colors">Edit Details</button>
+                    ) : (
+                      <div className="flex gap-3">
+                        <button onClick={() => setIsEditingHome(false)} className="px-6 py-3 bg-slate-100 text-slate-500 text-[10px] font-black uppercase rounded-xl hover:bg-slate-200">Cancel</button>
+                        <button onClick={handleUpdateHome} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl shadow-lg shadow-emerald-200">Save Changes</button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {[
+                      { label: 'Equipment in Place', value: editHome.equipment, key: 'equipment', placeholder: 'e.g. Hoist, Commode, Hospital Bed' },
+                      { label: 'Lifeline/Pendant Alarm', value: editHome.lifeline, key: 'lifeline', placeholder: 'e.g. Yes, pendant worn' },
+                      { label: 'Pets', value: editHome.pets, key: 'pets', placeholder: 'e.g. 1 Dog (Rex), 2 Cats' },
+                      { label: 'Bin Day', value: editHome.binDay, key: 'binDay', placeholder: 'e.g. Tuesday' },
+                      { label: 'Fuse Box Location', value: editHome.fuseBoxLocation, key: 'fuseBoxLocation', placeholder: 'e.g. Under stairs' },
+                      { label: 'Stopcock Location', value: editHome.stopcockLocation, key: 'stopcockLocation', placeholder: 'e.g. Kitchen sink cupboard' },
+                    ].map(item => (
+                      <div key={item.key} className={item.key === 'equipment' ? 'md:col-span-2' : ''}>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.label}</label>
+                        {isEditingHome ? (
+                          <input 
+                            type="text"
+                            value={editHome[item.key]}
+                            onChange={(e) => setEditHome({...editHome, [item.key]: e.target.value})}
+                            placeholder={item.placeholder}
+                            className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900"
+                          />
+                        ) : (
+                          <p className="text-sm font-bold text-slate-900 mt-1">{
+                            item.key === 'equipment' 
+                              ? (client.environment?.equipment && client.environment.equipment.length > 0 ? client.environment.equipment.join(', ') : 'None Recorded')
+                              : (client.environment?.[item.key] || 'Not Recorded')
+                          }</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
                 {/* Clinical & Social History */}
-                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #8b5cf6' }}>
                   <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">Clinical & Social History</h3>
                     {userRole === 'admin' && (!isEditingInfo ? (
@@ -1274,7 +1615,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
 
            {activeSubTab === 'Risk Assessment' && (
               <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4">
-                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #f43f5e' }}>
                   <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 bg-slate-50 flex flex-col md:flex-row gap-4 justify-between items-center">
                      <h3 className="text-xl font-black text-slate-900 tracking-tight">Risk Assessment Profile</h3>
                      {userRole === 'admin' && (!isEditingRisk ? (
@@ -1320,7 +1661,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
 
                  {/* Add Task Form */}
                  {userRole === 'admin' && (
-                 <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm mb-8">
+                 <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm mb-8" style={{ borderTop: '6px solid #3b82f6' }}>
                     <div className="flex flex-col md:flex-row gap-4">
                        <input 
                          type="text" 
@@ -1409,7 +1750,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                     )}
                  </div>
 
-                 <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                 <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col" style={{ borderTop: '6px solid #3b82f6' }}>
                     {/* Calendar Header */}
                     <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <div className="flex items-center gap-4">
@@ -1582,7 +1923,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
 
            {activeSubTab === 'Timeline' && (
               <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4">
-                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #64748b' }}>
                   <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 bg-slate-50">
                      <h3 className="text-xl font-black text-slate-900 tracking-tight">Modification Timeline</h3>
                   </div>
@@ -1810,4 +2151,4 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
   );
 };
 
-export default ClientProfileView;
+export default ClientProfileView; 

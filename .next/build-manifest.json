@@ -32,10 +32,10 @@
       "static/chunks/main.js",
       "static/chunks/pages/admin.js"
     ],
-    "/login": [
+    "/patient-management": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/login.js"
+      "static/chunks/pages/patient-management.js"
     ]
   },
   "ampFirstPages": []
