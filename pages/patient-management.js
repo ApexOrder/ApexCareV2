@@ -22,6 +22,7 @@ export default function ServiceUserManagement() {
       area: 'North Springfield',
       auditStatus: 'Compliant',
       careLevel: 'High',
+      pocType: 'Long Term',
       serviceStartDate: '2022-01-15',
       ageBand: '70-79',
       regulatedCare: 'Yes',
@@ -94,6 +95,7 @@ I would like my carers to provide meal support on each visit. I would like these
       status: 'Active',
       group: 'Floor 1',
       groups: ['Floor 1'],
+      visits: [],
       nextOfKin: 'Sarah Miller (Daughter) - (555) 999-8888',
       careNotes: [],
       tasks: [],
@@ -124,7 +126,9 @@ I would like my carers to provide meal support on each visit. I would like these
   const [newServiceUser, setNewServiceUser] = useState({ 
     name: '', 
     preferredName: '',
+    profileImage: null,
     dob: '', 
+    pocType: '',
     gender: '', 
     pronouns: '',
     address: '', 
@@ -174,6 +178,7 @@ I would like my carers to provide meal support on each visit. I would like these
   const [addressSuggestions, setAddressSuggestions] = useState([]);
   const [showAddressSuggestions, setShowAddressSuggestions] = useState(false);
   const ignoreSearch = useRef(false);
+  const [pocTypeFilter, setPocTypeFilter] = useState('All');
 
   useEffect(() => {
     if (ignoreSearch.current) {
@@ -225,12 +230,35 @@ I would like my carers to provide meal support on each visit. I would like these
     setNewServiceUser({ ...newServiceUser, address: fullAddress });
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        alert('Only JPG and PNG files are allowed.');
+        e.target.value = '';
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        alert('File size must be less than 2MB.');
+        e.target.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewServiceUser({ ...newServiceUser, profileImage: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddServiceUser = (e) => {
     e.preventDefault();
     setServiceUsers([...serviceUsers, { ...newServiceUser, id: Date.now() }]);
     setNewServiceUser({ 
       name: '', 
       preferredName: '',
+      profileImage: null,
+      pocType: '',
       dob: '', 
       gender: '', 
       pronouns: '',
@@ -355,6 +383,24 @@ I would like my carers to provide meal support on each visit. I would like these
           <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="px-4 py-8 sm:px-0">
               
+              <div className="mb-6 flex justify-end">
+                <div className="flex items-center gap-2">
+                  <label htmlFor="pocFilter" className="text-sm font-medium text-gray-700">Filter by POC Type:</label>
+                  <select
+                    id="pocFilter"
+                    value={pocTypeFilter}
+                    onChange={(e) => setPocTypeFilter(e.target.value)}
+                    className="block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 bg-white"
+                  >
+                    <option value="All">All Types</option>
+                    <option value="Reablement">Reablement</option>
+                    <option value="Long Term">Long Term</option>
+                    <option value="FastTrack/EOL">FastTrack/EOL</option>
+                    <option value="Intermediate Care">Intermediate Care</option>
+                  </select>
+                </div>
+              </div>
+              
               {showForm && (
                 <div className="mb-8 bg-white shadow sm:rounded-lg p-6">
                   <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">Add New Service User</h3>
@@ -363,6 +409,24 @@ I would like my carers to provide meal support on each visit. I would like these
                       {/* Section: Personal Details */}
                       <div className="sm:col-span-6 border-b border-gray-200 pb-2 mb-2">
                         <h4 className="text-lg font-medium text-gray-900">Personal Details</h4>
+                      </div>
+                      <div className="sm:col-span-6">
+                        <label htmlFor="profileImage" className="block text-sm font-medium text-gray-700">Profile Image</label>
+                        <div className="mt-1 flex items-center gap-4">
+                          {newServiceUser.profileImage && (
+                            <img src={newServiceUser.profileImage} alt="Preview" className="h-12 w-12 rounded-full object-cover" />
+                          )}
+                          <input type="file" name="profileImage" id="profileImage" accept="image/jpeg, image/png"
+                            onChange={handleFileChange}
+                            className="block w-full text-sm text-slate-500
+                              file:mr-4 file:py-2 file:px-4
+                              file:rounded-full file:border-0
+                              file:text-sm file:font-semibold
+                              file:bg-blue-50 file:text-blue-700
+                              hover:file:bg-blue-100"
+                          />
+                        </div>
+                        <p className="mt-1 text-xs text-gray-500">JPG or PNG only. Max 2MB.</p>
                       </div>
                       <div className="sm:col-span-3">
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
@@ -425,7 +489,7 @@ I would like my carers to provide meal support on each visit. I would like these
                           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
                         />
                       </div>
-                      <div className="sm:col-span-6">
+                      <div className="sm:col-span-3">
                         <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status</label>
                         <select id="status" name="status"
                           value={newServiceUser.status}
@@ -434,6 +498,21 @@ I would like my carers to provide meal support on each visit. I would like these
                         >
                           <option>Active</option>
                           <option>Inactive</option>
+                        </select>
+                      </div>
+
+                      <div className="sm:col-span-3">
+                        <label htmlFor="pocType" className="block text-sm font-medium text-gray-700">POC Type</label>
+                        <select id="pocType" name="pocType"
+                          value={newServiceUser.pocType}
+                          onChange={(e) => setNewServiceUser({...newServiceUser, pocType: e.target.value})}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                        >
+                          <option value="">Select...</option>
+                          <option>Reablement</option>
+                          <option>Long Term</option>
+                          <option>FastTrack/EOL</option>
+                          <option>Intermediate Care</option>
                         </select>
                       </div>
 
@@ -746,7 +825,7 @@ I would like my carers to provide meal support on each visit. I would like these
 
               <div className="bg-white shadow overflow-hidden sm:rounded-md">
                 <ul role="list" className="divide-y divide-gray-200">
-                  {serviceUsers.map((serviceUser) => (
+                  {serviceUsers.filter(user => pocTypeFilter === 'All' || user.pocType === pocTypeFilter).map((serviceUser) => (
                     <li key={serviceUser.id} onClick={() => { setSelectedServiceUser(serviceUser); setIsEditing(false); }} className="block hover:bg-gray-50 cursor-pointer transition duration-150 ease-in-out">
                       <div className="px-4 py-4 sm:px-6">
                         <div className="flex items-center justify-between">

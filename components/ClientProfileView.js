@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import ClientFinanceView from './ClientFinanceView';
 
 const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyStateChange, userRole, staff = [], availableGroups = [] }) => {
@@ -12,6 +12,43 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {} });
   const [showQrModal, setShowQrModal] = useState(false);
   const [showReorderModal, setShowReorderModal] = useState(false);
+  const [visitPeriodFilter, setVisitPeriodFilter] = useState('All');
+  const [hoveredVisit, setHoveredVisit] = useState(null);
+  const [hoveredVisitPosition, setHoveredVisitPosition] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const emergencyQrData = useMemo(() => {
+    const data = [
+        `EMERGENCY SNAPSHOT - ${client.firstName} ${client.lastName}`,
+        `DOB: ${client.dob || 'Unknown'} | NHS: ${client.nhsNumber || 'Unknown'}`,
+        `Allergies: ${client.allergies && client.allergies.length > 0 ? client.allergies.join(', ') : 'NKDA'}`,
+        `DNACPR: ${client.legal?.dnacpr ? 'IN PLACE' : 'Attempt Resuscitation'}`,
+        `RESPEC: ${client.legal?.respecStatus || 'Not Recorded'}`,
+        `Contact: ${client.emergencyContact || 'None'}`
+    ].join('\n');
+    return encodeURIComponent(data);
+  }, [client]);
+
+  const handleProfileImageUpdate = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        alert('Only JPG and PNG files are allowed.');
+        e.target.value = '';
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        alert('File size must be less than 2MB.');
+        e.target.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onUpdateClient({ ...client, profileImage: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // State for status change reasoning
   const [statusModal, setStatusModal] = useState({ isOpen: false, type: null, title: '', message: '', reason: '' });
@@ -42,6 +79,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
     area: client.area || '',
     auditStatus: client.auditStatus || 'Compliant',
     careLevel: client.careLevel || 'Low',
+    pocType: client.pocType || '',
     pronouns: client.pronouns || '',
     gender: client.gender || '',
     sexuality: client.sexuality || '',
@@ -173,6 +211,124 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
     night: client.carePlan?.night || ''
   });
 
+  // Assessment History State
+  const [assessmentHistory, setAssessmentHistory] = useState([
+    { id: 1, name: 'Waterlow Score', date: '2023-10-15', score: '15 (High Risk)', nextDue: '2023-11-15', status: 'Completed' },
+    { id: 2, name: 'MUST', date: '2023-10-10', score: '0 (Low Risk)', nextDue: '2024-01-10', status: 'Completed' }
+  ]);
+
+  const [activeAssessment, setActiveAssessment] = useState(null);
+  const [viewingAssessment, setViewingAssessment] = useState(null);
+  const [assessmentAnswers, setAssessmentAnswers] = useState({});
+  const [showAssessmentSelector, setShowAssessmentSelector] = useState(false);
+
+  const assessmentDefinitions = {
+    'Waterlow Score': {
+      questions: [
+        { id: 'bmi', label: 'BMI / Weight for Height', options: [{ label: 'Average (BMI 20-24.9)', score: 0 }, { label: 'Above Average (BMI >25)', score: 1 }, { label: 'Obese (BMI >30)', score: 2 }, { label: 'Below Average (BMI <20)', score: 3 }] },
+        { id: 'skin', label: 'Skin Type', options: [{ label: 'Healthy', score: 0 }, { label: 'Tissue Paper', score: 1 }, { label: 'Dry', score: 1 }, { label: 'Oedematous', score: 1 }, { label: 'Clammy (Fever)', score: 1 }, { label: 'Discoloured', score: 2 }, { label: 'Broken/Spot', score: 3 }] },
+        { id: 'sexAge', label: 'Sex & Age', options: [{ label: 'Male', score: 1 }, { label: 'Female', score: 2 }, { label: '14-49', score: 1 }, { label: '50-64', score: 2 }, { label: '65-74', score: 3 }, { label: '75-80', score: 4 }, { label: '81+', score: 5 }] },
+        { id: 'continence', label: 'Continence', options: [{ label: 'Complete / Catheterised', score: 0 }, { label: 'Occasional Incontinence', score: 1 }, { label: 'Catheter / Incontinent of Faeces', score: 2 }, { label: 'Doubly Incontinent', score: 3 }] },
+        { id: 'mobility', label: 'Mobility', options: [{ label: 'Fully Mobile', score: 0 }, { label: 'Restless / Fidgety', score: 1 }, { label: 'Apathetic', score: 2 }, { label: 'Restricted', score: 3 }, { label: 'Bedbound / Traction', score: 4 }, { label: 'Chairbound', score: 5 }] }
+      ],
+      calculateScore: (answers) => Object.values(answers).reduce((a, b) => a + parseInt(b || 0), 0)
+    },
+    'MUST': {
+      questions: [
+        { id: 'bmi', label: 'BMI Score', options: [{ label: '>20 (>30 Obese)', score: 0 }, { label: '18.5 - 20', score: 1 }, { label: '<18.5', score: 2 }] },
+        { id: 'weightLoss', label: 'Weight Loss Score (unplanned)', options: [{ label: '<5%', score: 0 }, { label: '5-10%', score: 1 }, { label: '>10%', score: 2 }] },
+        { id: 'acute', label: 'Acute Disease Effect', options: [{ label: 'No', score: 0 }, { label: 'Yes', score: 2 }] }
+      ],
+      calculateScore: (answers) => Object.values(answers).reduce((a, b) => a + parseInt(b || 0), 0)
+    },
+    'Falls Risk Assessment Tool (FRAT)': {
+        questions: [
+            { id: 'history', label: 'History of Falls', options: [{ label: 'No', score: 0 }, { label: 'Yes', score: 1 }] },
+            { id: 'medication', label: 'Medications (Sedatives, etc.)', options: [{ label: 'No', score: 0 }, { label: 'Yes', score: 1 }] },
+            { id: 'mobility', label: 'Mobility Impairment', options: [{ label: 'No', score: 0 }, { label: 'Yes', score: 1 }] },
+            { id: 'cognition', label: 'Cognitive Impairment', options: [{ label: 'No', score: 0 }, { label: 'Yes', score: 1 }] }
+        ],
+        calculateScore: (answers) => Object.values(answers).reduce((a, b) => a + parseInt(b || 0), 0)
+    },
+    'Bed Rails Assessment': {
+        questions: [
+            { id: 'consent', label: 'Consent Obtained', options: [{ label: 'Yes', score: 0 }, { label: 'No', score: 1 }] },
+            { id: 'alternatives', label: 'Alternatives Tried', options: [{ label: 'Yes', score: 0 }, { label: 'No', score: 1 }] },
+            { id: 'risk', label: 'Risk of Entrapment', options: [{ label: 'Low', score: 0 }, { label: 'High', score: 1 }] }
+        ],
+        calculateScore: (answers) => Object.values(answers).reduce((a, b) => a + parseInt(b || 0), 0)
+    }
+  };
+
+  const handleStartAssessment = (name) => {
+    if (assessmentDefinitions[name]) {
+        setActiveAssessment(name);
+        setAssessmentAnswers({});
+        setShowAssessmentSelector(false);
+    } else {
+        alert('Assessment template not available.');
+    }
+  };
+
+  const handleSaveAssessmentResult = () => {
+      const def = assessmentDefinitions[activeAssessment];
+      
+      // Calculate score and gather details based on selected indices
+      let score = 0;
+      const details = def.questions.map(q => {
+          const selectedIdx = parseInt(assessmentAnswers[q.id]);
+          if (isNaN(selectedIdx)) return null;
+          const opt = q.options[selectedIdx];
+          score += opt.score;
+          return { question: q.label, answer: opt.label, score: opt.score };
+      }).filter(Boolean);
+
+      let outcome = 'Low Risk';
+      if (activeAssessment === 'Waterlow Score') {
+          if (score >= 10) outcome = 'At Risk';
+          if (score >= 15) outcome = 'High Risk';
+          if (score >= 20) outcome = 'Very High Risk';
+      } else if (activeAssessment === 'MUST') {
+          if (score >= 1) outcome = 'Medium Risk';
+          if (score >= 2) outcome = 'High Risk';
+      } else if (activeAssessment.includes('FRAT')) {
+          if (score >= 1) outcome = 'High Risk';
+      } else if (activeAssessment.includes('Bed Rails')) {
+          if (score > 0) outcome = 'Review Required';
+          else outcome = 'Safe to Proceed';
+      }
+
+      const newRecord = {
+          id: Date.now(),
+          name: activeAssessment,
+          date: new Date().toISOString(),
+          score: `${score} (${outcome})`,
+          nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // +30 days
+          status: 'Completed',
+          author: 'Leon Lowden (Admin)',
+          details: details
+      };
+
+      setAssessmentHistory([newRecord, ...assessmentHistory]);
+      setActiveAssessment(null);
+      setAssessmentAnswers({});
+  };
+
+  const recommendedAssessments = useMemo(() => {
+    const recs = [];
+    if (client.mobility?.riskOfFalls === 'High') {
+        recs.push({ name: 'Falls Risk Assessment Tool (FRAT)', reason: 'High Falls Risk identified in profile.' });
+        recs.push({ name: 'Bed Rails Assessment', reason: 'High Falls Risk may require bed rails.' });
+    }
+    if (client.nutrition?.chokingRisk) {
+        recs.push({ name: 'SALT Referral', reason: 'Choking risk identified.' });
+    }
+    if (!assessmentHistory.find(a => a.name === 'Moving & Handling')) {
+        recs.push({ name: 'Moving & Handling Plan', reason: 'Routine requirement.' });
+    }
+    return recs;
+  }, [client, assessmentHistory]);
+
   // Calculate CQC Status based on profile completeness
   const cqcStatus = useMemo(() => {
      const missing = [];
@@ -203,6 +359,16 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
      };
   }, [client]);
 
+  const timeOptions = useMemo(() => {
+      const options = [];
+      for (let i = 0; i < 24; i++) {
+          for (let j = 0; j < 60; j += 15) {
+              options.push(`${String(i).padStart(2, '0')}:${String(j).padStart(2, '0')}`);
+          }
+      }
+      return options;
+  }, []);
+
   const [isFinanceDirty, setIsFinanceDirty] = useState(false);
 
   useEffect(() => {
@@ -212,16 +378,36 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
 
   // Tasks state
   const [tasks, setTasks] = useState(client.tasks || []);
-  const [newTaskDesc, setNewTaskDesc] = useState('');
+  const [taskSearch, setTaskSearch] = useState('');
+  const [showTaskDropdown, setShowTaskDropdown] = useState(false);
   const [newTaskTime, setNewTaskTime] = useState('Anytime');
+  const [newTaskFrequency, setNewTaskFrequency] = useState('Daily');
+  const [newTaskDays, setNewTaskDays] = useState([]);
 
-  const handleAddTask = () => {
-    if (!newTaskDesc.trim()) return;
+  const predefinedTasks = {
+    'Personal Care': ['Assist with washing/showering', 'Assist with dressing', 'Oral hygiene', 'Hair care', 'Shaving'],
+    'Nutrition & Hydration': ['Prepare breakfast', 'Prepare lunch', 'Prepare dinner', 'Prepare snacks', 'Encourage fluids', 'Monitor intake'],
+    'Medication': ['Prompt medication', 'Administer medication', 'Apply creams/lotions', 'Collect prescription'],
+    'Domestic': ['Light cleaning', 'Laundry', 'Ironing', 'Change bed linen', 'Take out rubbish'],
+    'Social': ['Companionship', 'Accompaniment to appointments', 'Shopping']
+  };
+
+  const handleAddTask = (description) => {
+    const desc = typeof description === 'string' ? description : taskSearch;
+    if (!desc.trim()) return;
+
+    if (newTaskFrequency === 'Specific Days' && newTaskDays.length === 0) {
+        alert('Please select at least one day.');
+        return;
+    }
+
     const newTask = {
       id: `t-${Date.now()}`,
-      description: newTaskDesc,
+      description: desc,
       isCompleted: false,
-      timeOfDay: newTaskTime
+      timeOfDay: newTaskTime,
+      frequency: newTaskFrequency,
+      days: newTaskFrequency === 'Specific Days' ? newTaskDays : null
     };
     const updatedTasks = [...tasks, newTask];
     setTasks(updatedTasks);
@@ -229,7 +415,10 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
       ...client,
       tasks: updatedTasks
     });
-    setNewTaskDesc('');
+    setTaskSearch('');
+    setShowTaskDropdown(false);
+    setNewTaskFrequency('Daily');
+    setNewTaskDays([]);
   };
 
   const handleToggleTask = (taskId) => {
@@ -255,7 +444,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
   };
 
   // Visits state
-  const [visits, setVisits] = useState([]);
+  const [visits, setVisits] = useState(client.visits || []);
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const handlePrevMonth = () => {
@@ -266,12 +455,44 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   };
 
-  const getVisitPeriod = (time) => {
+  const getPeriodColor = (time) => {
+    const period = getVisitPeriod(time);
+    switch(period) {
+        case 'Morning': return 'bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100';
+        case 'Lunch': return 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100';
+        case 'Tea': return 'bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100';
+        case 'Evening': return 'bg-indigo-50 text-indigo-700 border-indigo-100 hover:bg-indigo-100';
+        default: return 'bg-slate-50 text-slate-700 border-slate-100 hover:bg-slate-100';
+    }
+  };
+
+  const getVisitPeriod = useCallback((time) => {
+    if (!time) return 'Unknown';
     const hour = parseInt(time.split(':')[0]);
     if (hour < 12) return 'Morning';
     if (hour < 14) return 'Lunch';
     if (hour < 17) return 'Tea';
     return 'Evening';
+  }, []);
+
+  const filteredVisits = useMemo(() => {
+    if (visitPeriodFilter === 'All') {
+        return visits;
+    }
+    return visits.filter(v => getVisitPeriod(v.time) === visitPeriodFilter);
+  }, [visits, visitPeriodFilter, getVisitPeriod]);
+
+  const handleVisitMouseEnter = (e, visit) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setHoveredVisitPosition({
+        top: rect.top,
+        left: rect.left + rect.width / 2,
+    });
+    setHoveredVisit(visit);
+  };
+
+  const handleVisitMouseLeave = () => {
+    setHoveredVisit(null);
   };
 
   const [visitModal, setVisitModal] = useState({ isOpen: false, mode: 'add', visit: null });
@@ -281,6 +502,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
     type: 'One-off',
     date: '',
     time: '',
+    endTime: '',
     duration: '',
     carer: '',
     status: 'Scheduled',
@@ -291,14 +513,19 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
     cancellationReason: '',
     cancelledBy: '',
     invoiceClient: 'Yes',
-    payCarer: 'Yes'
+    payCarer: 'Yes',
+    carerCount: '1',
+    hasAdditionalCarer: false,
+    additionalCarerType: 'Shadowing',
+    additionalPayRate: ''
   });
 
   const handleOpenAddVisit = (date, time) => {
     setVisitForm({
-        type: 'One-off',
+        type: 'Recurring',
         date: date || '',
         time: time || '',
+        endTime: '',
         duration: '',
         carer: '',
         status: 'Scheduled',
@@ -309,23 +536,40 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
         cancellationReason: '',
         cancelledBy: '',
         invoiceClient: 'Yes',
-        payCarer: 'Yes'
+        payCarer: 'Yes',
+        carerCount: '1',
+        hasAdditionalCarer: false,
+        additionalCarerType: 'Shadowing',
+        additionalPayRate: ''
     });
     setIsCancelling(false);
     setVisitModal({ isOpen: true, mode: 'add', visit: null });
   };
 
   const handleOpenEditVisit = (visit) => {
-    setVisitForm({ ...visit });
+    const getMinutes = (t) => parseInt(t.split(':')[0] || '0') * 60 + parseInt(t.split(':')[1] || '0');
+    const startMins = getMinutes(visit.time);
+    let durationMins = 0;
+    if (visit.duration === 'Night Shift') durationMins = 480;
+    else if (visit.duration?.toString().includes('h')) {
+         const parts = visit.duration.toString().split('h');
+         durationMins = parseInt(parts[0]) * 60;
+         if (parts[1] && parts[1].includes('m')) {
+             durationMins += parseInt(parts[1]);
+         }
+    } else {
+        durationMins = parseInt(visit.duration || '0');
+    }
+    const endMins = startMins + durationMins;
+    const endH = Math.floor(endMins / 60) % 24;
+    const endM = endMins % 60;
+    const endTime = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+    setVisitForm({ ...visit, endTime, carerCount: visit.carerCount || '1', hasAdditionalCarer: visit.hasAdditionalCarer || false, additionalCarerType: visit.additionalCarerType || 'Shadowing', additionalPayRate: visit.additionalPayRate || '' });
     setIsCancelling(false);
     setVisitModal({ isOpen: true, mode: 'edit', visit });
   };
 
-  const handleSaveVisit = () => {
-    if (!visitForm.carer || visitForm.carer === 'Unassigned') {
-        alert('Please select a carer.');
-        return;
-    }
+  const _confirmAndSaveVisit = () => {
     if (!visitForm.date) {
         alert('Please select a date.');
         return;
@@ -339,11 +583,9 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
     // Conflict Check
     const getMinutes = (t) => parseInt(t.split(':')[0] || '0') * 60 + parseInt(t.split(':')[1] || '0');
     const newStart = getMinutes(visitForm.time || '00:00');
-    const durationMinutes = visitForm.duration === 'Night Shift' ? 480 : 
-                           visitForm.duration?.includes('h') ? 
-                           (parseInt(visitForm.duration.split('h')[0]) * 60 + (visitForm.duration.includes('m') ? parseInt(visitForm.duration.split('h')[1]) : 0)) : 
-                           parseInt(visitForm.duration || '0');
-    const newEnd = newStart + durationMinutes;
+    const newEnd = getMinutes(visitForm.endTime || '00:00');
+    let durationMinutes = newEnd - newStart;
+    if (durationMinutes < 0) durationMinutes += 24 * 60;
 
     const checkConflict = (targetDate) => {
         return visits.find(v => {
@@ -353,10 +595,17 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
             if (v.date !== targetDate) return false;
 
             const vStart = getMinutes(v.time);
-            const vDur = v.duration === 'Night Shift' ? 480 : 
-                         v.duration.includes('h') ? 
-                         (parseInt(v.duration.split('h')[0]) * 60 + (v.duration.includes('m') ? parseInt(v.duration.split('h')[1]) : 0)) : 
-                         parseInt(v.duration);
+            let vDur = 0;
+            if (v.duration === 'Night Shift') vDur = 480;
+            else if (v.duration?.toString().includes('h')) {
+                 const parts = v.duration.toString().split('h');
+                 vDur = parseInt(parts[0]) * 60;
+                 if (parts[1] && parts[1].includes('m')) {
+                     vDur += parseInt(parts[1]);
+                 }
+            } else {
+                vDur = parseInt(v.duration || '0');
+            }
             const vEnd = vStart + vDur;
 
             return (newStart < vEnd && vStart < newEnd);
@@ -374,7 +623,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
             id: visitModal.visit?.id || `v-${Date.now()}`,
             date: visitForm.date || '',
             time: visitForm.time || 'TBD',
-            duration: visitForm.duration || 'TBD',
+            duration: durationMinutes.toString(),
             carer: visitForm.carer || 'Unassigned',
             status: isCancelling ? 'Cancelled' : (visitForm.status || 'Scheduled'),
             type: visitForm.type || 'One-off',
@@ -385,7 +634,11 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
             cancellationReason: visitForm.cancellationReason,
             cancelledBy: visitForm.cancelledBy,
             invoiceClient: visitForm.invoiceClient,
-            payCarer: visitForm.payCarer
+            payCarer: visitForm.payCarer,
+            carerCount: visitForm.carerCount,
+            hasAdditionalCarer: visitForm.hasAdditionalCarer,
+            additionalCarerType: visitForm.hasAdditionalCarer ? visitForm.additionalCarerType : null,
+            additionalPayRate: visitForm.hasAdditionalCarer ? visitForm.additionalPayRate : null
         });
     } else {
         // Recurring Generation
@@ -402,38 +655,73 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
             if (visitForm.frequency === 'Weekly' && visitForm.selectedDays?.includes(dayName)) shouldAdd = true;
 
             if (shouldAdd) {
-                if (checkConflict(dateStr)) {
-                    alert(`Conflict detected on ${dateStr}. Series creation aborted.`);
-                    return;
-                }
                 visitsToAdd.push({
                     id: `v-${Date.now()}-${i}`,
                     date: dateStr,
                     time: visitForm.time || 'TBD',
-                    duration: visitForm.duration || 'TBD',
+                    duration: durationMinutes.toString(),
                     carer: visitForm.carer || 'Unassigned',
                     status: isCancelling ? 'Cancelled' : 'Scheduled',
                     type: 'Recurring',
                     frequency: visitForm.frequency,
                     selectedDays: visitForm.selectedDays,
                     note: visitForm.note,
-                    tasks: visitForm.tasks
+                    tasks: visitForm.tasks,
+                    carerCount: visitForm.carerCount,
+                    hasAdditionalCarer: visitForm.hasAdditionalCarer,
+                    additionalCarerType: visitForm.hasAdditionalCarer ? visitForm.additionalCarerType : null,
+                    additionalPayRate: visitForm.hasAdditionalCarer ? visitForm.additionalPayRate : null
                 });
             }
         }
     }
 
+    let updatedVisits;
     if (visitModal.mode === 'edit' && visitModal.visit) {
-        setVisits(visits.map(v => v.id === visitModal.visit.id ? visitsToAdd[0] : v));
+        updatedVisits = visits.map(v => v.id === visitModal.visit.id ? visitsToAdd[0] : v);
     } else {
-        setVisits([...visits, ...visitsToAdd]);
+        updatedVisits = [...visits, ...visitsToAdd];
     }
+    setVisits(updatedVisits);
+    onUpdateClient({
+        ...client,
+        visits: updatedVisits
+    });
     setVisitModal({ ...visitModal, isOpen: false });
+  };
+
+  const handleSaveVisit = () => {
+    // New check for duplicate visit period
+    if (visitModal.mode === 'add') {
+        const newVisitPeriod = getVisitPeriod(visitForm.time);
+        const existingVisitInPeriod = visits.find(v => 
+            v.date === visitForm.date && 
+            getVisitPeriod(v.time) === newVisitPeriod &&
+            v.status !== 'Cancelled'
+        );
+
+        if (existingVisitInPeriod) {
+            setConfirmModal({
+                isOpen: true,
+                title: 'Duplicate Visit Period',
+                message: `A "${newVisitPeriod}" visit is already scheduled for this day. Are you sure you want to add another?`,
+                onConfirm: () => _confirmAndSaveVisit()
+            });
+            return;
+        }
+    }
+
+    _confirmAndSaveVisit();
   };
 
   const handleDeleteVisit = (id) => {
       if (window.confirm('Are you sure you want to delete this visit?')) {
-          setVisits(visits.filter(v => v.id !== id));
+          const updatedVisits = visits.filter(v => v.id !== id);
+          setVisits(updatedVisits);
+          onUpdateClient({
+              ...client,
+              visits: updatedVisits
+          });
       }
   };
 
@@ -607,6 +895,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
           { key: 'phone', label: 'Phone' }, { key: 'email', label: 'Email' }, { key: 'area', label: 'Area' },
           { key: 'auditStatus', label: 'Audit Status' }, { key: 'careLevel', label: 'Service Level' },
           { key: 'pronouns', label: 'Pronouns' },
+          { key: 'pocType', label: 'POC Type' },
           { key: 'gender', label: 'Gender' },
           { key: 'sexuality', label: 'Sexual Orientation' },
           { key: 'ethnicity', label: 'Ethnicity' },
@@ -892,13 +1181,35 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
   const getNoteColor = (cat) => {
     switch(cat) {
       case 'Concern': return 'bg-rose-50 border-rose-200 text-rose-600';
+      case 'Alert': return 'bg-rose-50 border-rose-200 text-rose-600';
+      case 'Incident': return 'bg-orange-50 border-orange-200 text-orange-600';
+      case 'Visit Log': return 'bg-purple-50 border-purple-200 text-purple-600';
       case 'Action': return 'bg-blue-50 border-blue-200 text-blue-600';
       case 'Task': return 'bg-emerald-50 border-emerald-200 text-emerald-600';
       default: return 'bg-slate-100 border-slate-200 text-slate-500';
     }
   };
 
-  const filteredNotes = (client.careNotes || []).filter(n => noteFilter === 'All' || n.category === noteFilter);
+  const handleTogglePin = (noteId) => {
+    const updatedNotes = (client.careNotes || []).map(n => 
+      n.id === noteId ? { ...n, isPinned: !n.isPinned } : n
+    );
+    onUpdateClient({ ...client, careNotes: updatedNotes });
+  };
+
+  const handleUpdateStatus = (noteId, newStatus) => {
+    const updatedNotes = (client.careNotes || []).map(n => 
+      n.id === noteId ? { ...n, status: newStatus } : n
+    );
+    onUpdateClient({ ...client, careNotes: updatedNotes });
+  };
+
+  const filteredNotes = (client.careNotes || [])
+    .filter(n => noteFilter === 'All' || n.category === noteFilter)
+    .sort((a, b) => {
+        if (a.isPinned === b.isPinned) return new Date(b.date) - new Date(a.date);
+        return a.isPinned ? -1 : 1;
+    });
 
   const managementMenu = [
     { id: 'Overview', icon: '🏠' },
@@ -915,15 +1226,30 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
   return (
     <div className="flex flex-col lg:flex-row h-auto lg:h-screen bg-slate-50 overflow-y-auto lg:overflow-hidden">
       {/* MANAGEMENT SUB-NAVBAR */}
-      <div className="w-full lg:w-72 bg-white border-r border-l border-slate-200 flex flex-col h-auto lg:h-full shadow-2xl z-[110] shrink-0">
-        <div className="p-6 md:p-8 border-b border-slate-200 flex flex-col items-center">
-          <div className="relative mb-4">
-             <img src={`https://picsum.photos/seed/${client.id}/120/120`} className="w-20 h-20 rounded-[2rem] object-cover shadow-2xl border-4 border-white" alt="" />
+      <div className="w-full lg:w-24 group hover:lg:w-72 bg-white border-r border-l border-slate-200 flex flex-col h-auto lg:h-full shadow-2xl z-[110] shrink-0 transition-all duration-300 ease-in-out">
+        <div className="p-4 lg:group-hover:p-6 md:lg:group-hover:p-8 border-b border-slate-200 flex flex-col items-center transition-all">
+          <div className="relative mb-4 cursor-pointer" onClick={() => userRole === 'admin' && fileInputRef.current?.click()}>
+             <img src={client.profileImage || `https://picsum.photos/seed/${client.id}/120/120`} className="w-16 h-16 lg:group-hover:w-20 lg:group-hover:h-20 rounded-[1.5rem] lg:group-hover:rounded-[2rem] object-cover shadow-2xl border-4 border-white transition-all" alt="" />
+             {userRole === 'admin' && (
+               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-[10px] font-black text-slate-700 bg-white/90 px-2 py-1 rounded-lg backdrop-blur-sm uppercase tracking-widest shadow-sm">Edit</span>
+               </div>
+             )}
              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-4 border-white rounded-full"></div>
+             <input type="file" ref={fileInputRef} className="hidden" accept="image/jpeg, image/png" onChange={handleProfileImageUpdate} />
           </div>
-          <h2 className="text-xl font-black text-slate-900 text-center leading-none mb-1">{client.firstName} {client.lastName}</h2>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{client.id}</p>
-          <button onClick={onBack} className="mt-6 w-full py-3 bg-slate-100 hover:bg-slate-200 text-[10px] font-black uppercase text-slate-500 rounded-xl transition-all">← Exit to Dashboard</button>
+          <div className="flex flex-col items-center overflow-hidden transition-all duration-300 ease-in-out lg:max-h-0 lg:opacity-0 lg:group-hover:max-h-24 lg:group-hover:opacity-100">
+             <h2 className="text-xl font-black text-slate-900 text-center leading-none mb-1 whitespace-nowrap">{client.firstName} {client.lastName}</h2>
+             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{client.id}</p>
+          </div>
+          <button onClick={onBack} className="mt-6 w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl transition-all relative overflow-hidden">
+            <div className="absolute inset-0 flex items-center justify-center transition-all duration-300 opacity-100 lg:group-hover:opacity-0 lg:group-hover:scale-75">
+                <span className="text-xl">←</span>
+            </div>
+            <div className="w-full flex items-center justify-center transition-all duration-300 opacity-0 lg:group-hover:opacity-100">
+                 <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Exit to Dashboard</span>
+            </div>
+          </button>
         </div>
 
         <nav className="flex-1 overflow-x-auto lg:overflow-y-auto p-4 flex flex-row lg:flex-col gap-2 lg:gap-0 lg:space-y-1 scrollbar-hide">
@@ -931,14 +1257,14 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
             <button
               key={item.id}
               onClick={() => setActiveSubTab(item.id)}
-              className={`w-auto lg:w-full flex items-center gap-2 lg:gap-4 px-4 lg:px-5 py-2 lg:py-3 text-sm font-bold rounded-2xl transition-all whitespace-nowrap ${
+              className={`w-auto lg:w-full flex items-center lg:justify-center lg:group-hover:justify-start gap-2 lg:gap-0 lg:group-hover:gap-4 px-4 lg:group-hover:px-5 py-2 lg:py-3 text-sm font-bold rounded-2xl transition-all whitespace-nowrap ${
                 activeSubTab === item.id 
                   ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' 
                   : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
               <span className="text-xl shrink-0">{item.icon}</span>
-              <span className="truncate">{item.id}</span>
+              <span className="truncate lg:hidden lg:group-hover:inline">{item.id}</span>
             </button>
           ))}
         </nav>
@@ -948,40 +1274,40 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
       <div className="flex-1 overflow-y-visible lg:overflow-y-auto flex flex-col relative bg-slate-50 z-0 pb-24 md:pb-0">
         
         {/* ENHANCED GOVERNANCE HEADER */}
-        <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 md:px-12 py-6 md:py-8 z-[100] flex flex-col xl:flex-row items-center justify-end shadow-sm gap-6">
-           <div className="flex gap-4 w-full md:w-auto">
+        <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 md:px-8 py-4 z-[100] flex flex-col xl:flex-row items-center justify-end shadow-sm gap-4">
+           <div className="flex gap-3 w-full md:w-auto">
               <button 
                   onClick={() => setShowQrModal(true)}
-                  className="w-full md:w-auto px-6 py-3 bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-slate-50 transition-colors shadow-sm flex items-center justify-center gap-2"
+                  className="w-full md:w-auto px-4 py-2 bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-slate-50 transition-colors shadow-sm flex items-center justify-center gap-2"
               >
-                  <span className="text-lg">📱</span> QR Access
+                  <span className="text-base">📱</span> QR Access
               </button>
               {userRole === 'admin' && (client.status === 'Active' ? (
                  <button 
                    onClick={handleDischargeClient}
-                   className="w-full md:w-auto px-6 py-3 bg-rose-50 text-rose-600 border border-rose-200 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-rose-100 transition-colors"
+                   className="w-full md:w-auto px-4 py-2 bg-rose-50 text-rose-600 border border-rose-200 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-rose-100 transition-colors"
                  >
                    Discharge Client
                  </button>
               ) : (
-                 <div className="flex gap-4 w-full md:w-auto">
+                 <div className="flex gap-3 w-full md:w-auto">
                     {client.status === 'Hospitalized' && (
                         <button 
                            onClick={handleDischargeClient}
-                           className="w-full md:w-auto px-6 py-3 bg-rose-50 text-rose-600 border border-rose-200 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-rose-100 transition-colors"
+                           className="w-full md:w-auto px-4 py-2 bg-rose-50 text-rose-600 border border-rose-200 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-rose-100 transition-colors"
                         >
                            Discharge
                         </button>
                     )}
                     <button 
                         onClick={handleReadmitClient}
-                        className="w-full md:w-auto px-6 py-3 bg-emerald-50 text-emerald-600 border border-emerald-200 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-100 transition-colors"
+                        className="w-full md:w-auto px-4 py-2 bg-emerald-50 text-emerald-600 border border-emerald-200 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-emerald-100 transition-colors"
                     >
                         {client.status === 'Hospitalized' ? 'Re-activate Client' : 'Re-admit Client'}
                     </button>
                  </div>
               ))}
-              <button className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-200 transition-transform active:scale-95">Export Evidence Pack</button>
+              <button className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg shadow-blue-200 transition-transform active:scale-95"><span className="mr-2">📂</span>Export Evidence Pack</button>
            </div>
         </div>
 
@@ -1058,6 +1384,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                        { label: 'NHS Number', value: client.nhsNumber || 'Not Recorded' },
                        { label: 'Age / DOB', value: calculateAge(client.dob).full },
                        { label: 'Group', value: client.group || 'Not Assigned' },
+                       { label: 'POC Type', value: client.pocType || 'Not Recorded' },
                        { label: 'Primary Contact', value: client.phone || 'N/A', isPhone: true },
                        { label: 'Address', value: client.address || 'Not Recorded', isAddress: true, fullWidth: true },
                      ].map(item => (
@@ -1194,6 +1521,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
 
                        { label: 'Service Start Date', value: client.serviceStartDate, key: 'serviceStartDate', type: 'date' },
                        { label: 'Service Level', value: client.careLevel, key: 'careLevel' },
+                       { label: 'POC Type', value: client.pocType, key: 'pocType', type: 'select', options: ['Reablement', 'Long Term', 'FastTrack/EOL', 'Intermediate Care'] },
                        { label: 'Area', value: client.area, key: 'area' },
                       { label: 'Group', value: client.group, key: 'group', type: 'select', options: availableGroups },
                        { label: 'Regulated Care', value: client.regulatedCare, key: 'regulatedCare' },
@@ -1647,6 +1975,72 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                      {/* ... Other Risks ... */}
                   </div>
                 </section>
+
+                {/* Recommended Assessments */}
+                {recommendedAssessments.length > 0 && (
+                    <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="px-6 md:px-10 py-6 border-b border-slate-200 bg-amber-50">
+                            <h3 className="text-xl font-black text-amber-800 tracking-tight flex items-center gap-2">
+                                ⚠️ Recommended Assessments
+                            </h3>
+                        </div>
+                        <div className="p-6 md:p-10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {recommendedAssessments.map((rec, idx) => (
+                                    <div key={idx} className="p-4 border border-amber-200 bg-amber-50/50 rounded-2xl flex justify-between items-center">
+                                        <div>
+                                            <p className="font-black text-slate-900">{rec.name}</p>
+                                            <p className="text-xs font-bold text-amber-700 mt-1">{rec.reason}</p>
+                                        </div>
+                                        <button onClick={() => handleStartAssessment(rec.name)} className="px-4 py-2 bg-white border border-amber-200 text-amber-700 text-[10px] font-black uppercase rounded-xl hover:bg-amber-100 transition-colors shadow-sm">
+                                            Start
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* Assessment History */}
+                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                    <div className="px-6 md:px-10 py-6 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Assessment History</h3>
+                        <button onClick={() => setShowAssessmentSelector(true)} className="px-6 py-3 bg-blue-600 text-white text-[10px] font-black uppercase rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">
+                            + New Assessment
+                        </button>
+                    </div>
+                    <div className="p-0">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="border-b border-slate-100">
+                                    <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Assessment</th>
+                                    <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</th>
+                                    <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Score / Outcome</th>
+                                    <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Next Due</th>
+                                    <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {assessmentHistory.map((assessment) => (
+                                    <tr key={assessment.id} className="hover:bg-slate-50 transition-colors">
+                                        <td className="p-6 font-bold text-slate-900">{assessment.name}</td>
+                                        <td className="p-6 text-sm font-medium text-slate-600">{new Date(assessment.date).toLocaleDateString('en-GB')}</td>
+                                        <td className="p-6">
+                                            <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase border ${assessment.score.includes('High') ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+                                                {assessment.score}
+                                            </span>
+                                        </td>
+                                        <td className="p-6 text-sm font-medium text-slate-600">{new Date(assessment.nextDue).toLocaleDateString('en-GB')}</td>
+                                        <td className="p-6 text-right">
+                                            <button onClick={() => setViewingAssessment(assessment)} className="text-blue-600 font-bold text-xs hover:underline">View</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
               </div>
            )}
 
@@ -1662,43 +2056,158 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                  {/* Add Task Form */}
                  {userRole === 'admin' && (
                  <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm mb-8" style={{ borderTop: '6px solid #3b82f6' }}>
-                    <div className="flex flex-col md:flex-row gap-4">
-                       <input 
-                         type="text" 
-                         placeholder="Add a new task..." 
-                         className="flex-1 bg-slate-50 border-slate-200 rounded-xl p-4 font-bold text-slate-700 outline-none border focus:ring-2 focus:ring-blue-500/20"
-                         value={newTaskDesc}
-                         onChange={(e) => setNewTaskDesc(e.target.value)}
-                         onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
-                       />
-                       <select
-                         className="bg-slate-50 border-slate-200 rounded-xl p-4 font-bold text-slate-700 outline-none border focus:ring-2 focus:ring-blue-500/20"
-                         value={newTaskTime}
-                         onChange={(e) => setNewTaskTime(e.target.value)}
-                       >
-                         <option value="Morning">Morning</option>
-                         <option value="Afternoon">Afternoon</option>
-                         <option value="Evening">Evening</option>
-                         <option value="Anytime">Anytime</option>
-                       </select>
+                    <div className="flex flex-col gap-4">
+                       <div className="flex flex-col md:flex-row gap-4 items-start">
+                       <div className="flex-1 relative w-full">
+                           <input 
+                             type="text" 
+                             placeholder="Search or type custom task..." 
+                             className="w-full bg-slate-50 border-slate-200 rounded-xl p-4 font-bold text-slate-700 outline-none border focus:ring-2 focus:ring-blue-500/20"
+                             value={taskSearch}
+                             onChange={(e) => {
+                                 setTaskSearch(e.target.value);
+                                 setShowTaskDropdown(true);
+                             }}
+                             onFocus={() => setShowTaskDropdown(true)}
+                             onBlur={() => setTimeout(() => setShowTaskDropdown(false), 200)}
+                             onKeyDown={(e) => e.key === 'Enter' && handleAddTask(taskSearch)}
+                           />
+                           {showTaskDropdown && (
+                               <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                                   {Object.entries(predefinedTasks).map(([category, items]) => {
+                                       const filteredItems = items.filter(i => i.toLowerCase().includes(taskSearch.toLowerCase()));
+                                       if (filteredItems.length === 0) return null;
+                                       return (
+                                           <div key={category}>
+                                               <div className="px-4 py-2 bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest sticky top-0 border-b border-slate-100">
+                                                   {category}
+                                               </div>
+                                               {filteredItems.map(item => (
+                                                   <button
+                                                       key={item}
+                                                       className="w-full text-left px-4 py-3 hover:bg-blue-50 text-sm font-bold text-slate-700 transition-colors border-b border-slate-50 last:border-0"
+                                                       onMouseDown={() => {
+                                                           setTaskSearch(item);
+                                                           setShowTaskDropdown(false);
+                                                       }}
+                                                   >
+                                                       {item}
+                                                   </button>
+                                               ))}
+                                           </div>
+                                       );
+                                   })}
+                                   {taskSearch && !Object.values(predefinedTasks).flat().some(i => i.toLowerCase() === taskSearch.toLowerCase()) && (
+                                       <button
+                                           className="w-full text-left px-4 py-3 hover:bg-blue-50 text-sm font-bold text-blue-600 transition-colors border-t border-slate-100"
+                                           onMouseDown={() => setShowTaskDropdown(false)}
+                                       >
+                                           Use custom: "{taskSearch}"
+                                       </button>
+                                   )}
+                               </div>
+                           )}
+                       </div>
+                       <div className="flex flex-col gap-2 min-w-[140px]">
+                           <select
+                             className="bg-slate-50 border-slate-200 rounded-xl p-4 font-bold text-slate-700 outline-none border focus:ring-2 focus:ring-blue-500/20 w-full"
+                             value={['Morning', 'Afternoon', 'Evening', 'Anytime'].includes(newTaskTime) ? newTaskTime : 'Specific'}
+                             onChange={(e) => {
+                                 if (e.target.value === 'Specific') {
+                                     setNewTaskTime('');
+                                 } else {
+                                     setNewTaskTime(e.target.value);
+                                 }
+                             }}
+                           >
+                             <option value="Morning">Morning</option>
+                             <option value="Afternoon">Afternoon</option>
+                             <option value="Evening">Evening</option>
+                             <option value="Anytime">Anytime</option>
+                             <option value="Specific">Specific Time</option>
+                           </select>
+                           {!['Morning', 'Afternoon', 'Evening', 'Anytime'].includes(newTaskTime) && (
+                               <input 
+                                   type="time"
+                                   className="bg-slate-50 border-slate-200 rounded-xl p-4 font-bold text-slate-700 outline-none border focus:ring-2 focus:ring-blue-500/20 w-full"
+                                   value={newTaskTime}
+                                   onChange={(e) => setNewTaskTime(e.target.value)}
+                               />
+                           )}
+                       </div>
+                       </div>
+
+                       <div className="flex flex-col md:flex-row gap-4 items-center justify-between border-t border-slate-100 pt-4">
+                           <div className="flex flex-col md:flex-row gap-4 items-center w-full md:w-auto">
+                               <select
+                                   className="w-full md:w-auto bg-slate-50 border-slate-200 rounded-xl p-3 font-bold text-slate-700 outline-none border focus:ring-2 focus:ring-blue-500/20 text-sm"
+                                   value={newTaskFrequency}
+                                   onChange={(e) => setNewTaskFrequency(e.target.value)}
+                               >
+                                   <option value="Daily">Daily</option>
+                                   <option value="Specific Days">Specific Days</option>
+                                   <option value="One-off">One-off</option>
+                               </select>
+
+                               {newTaskFrequency === 'Specific Days' && (
+                                   <div className="flex gap-1 flex-wrap">
+                                       {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                                           <button
+                                               key={day}
+                                               onClick={() => {
+                                                   if (newTaskDays.includes(day)) {
+                                                       setNewTaskDays(newTaskDays.filter(d => d !== day));
+                                                   } else {
+                                                       setNewTaskDays([...newTaskDays, day]);
+                                                   }
+                                               }}
+                                               className={`px-3 py-2 rounded-lg text-[10px] font-black uppercase border transition-colors ${newTaskDays.includes(day) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-400 border-slate-200 hover:border-blue-400'}`}
+                                           >
+                                               {day}
+                                           </button>
+                                       ))}
+                                   </div>
+                               )}
+                           </div>
+
                        <button 
-                         onClick={handleAddTask}
-                         className="bg-blue-600 text-white px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95 hover:bg-blue-700"
+                         onClick={() => handleAddTask(taskSearch)}
+                         className="w-full md:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95 hover:bg-blue-700"
                        >
                          Add Task
                        </button>
+                    </div>
                     </div>
                  </div>
                  )}
 
                  {/* Task Lists */}
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {['Morning', 'Afternoon', 'Evening', 'Anytime'].map(time => {
-                       const timeTasks = tasks.filter(t => t.timeOfDay === time);
+                    {['Morning', 'Afternoon', 'Evening', 'Anytime'].map(period => {
+                       const timeTasks = tasks.filter(t => {
+                           const tTime = t.timeOfDay;
+                           if (['Morning', 'Afternoon', 'Evening', 'Anytime'].includes(tTime)) {
+                               return tTime === period;
+                           }
+                           const hour = parseInt(tTime.split(':')[0]);
+                           if (isNaN(hour)) return period === 'Anytime';
+                           if (period === 'Morning') return hour < 12;
+                           if (period === 'Afternoon') return hour >= 12 && hour < 17;
+                           if (period === 'Evening') return hour >= 17;
+                           return false;
+                       }).sort((a, b) => {
+                           const isSpecificA = !['Morning', 'Afternoon', 'Evening', 'Anytime'].includes(a.timeOfDay);
+                           const isSpecificB = !['Morning', 'Afternoon', 'Evening', 'Anytime'].includes(b.timeOfDay);
+                           if (isSpecificA && isSpecificB) return a.timeOfDay.localeCompare(b.timeOfDay);
+                           if (isSpecificA) return -1;
+                           if (isSpecificB) return 1;
+                           return 0;
+                       });
+
                        if (timeTasks.length === 0) return null;
                        return (
-                         <div key={time} className="space-y-4">
-                            <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest pl-2">{time}</h3>
+                         <div key={period} className="space-y-4">
+                            <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest pl-2">{period}</h3>
                             <div className="space-y-3">
                                {timeTasks.map(task => (
                                   <div key={task.id} className={`group flex items-center gap-4 p-4 rounded-2xl border transition-all ${task.isCompleted ? 'bg-emerald-50 border-emerald-200 opacity-75' : 'bg-white border-slate-200 shadow-sm'}`}>
@@ -1708,7 +2217,22 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                                      >
                                        {task.isCompleted && '✓'}
                                      </button>
-                                     <span className={`flex-1 font-bold ${task.isCompleted ? 'text-emerald-700 line-through' : 'text-slate-700'}`}>{task.description}</span>
+                                     <span className={`flex-1 font-bold ${task.isCompleted ? 'text-emerald-700 line-through' : 'text-slate-700'}`}>
+                                         {!['Morning', 'Afternoon', 'Evening', 'Anytime'].includes(task.timeOfDay) && (
+                                             <span className="mr-2 px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] rounded-lg border border-blue-100">{task.timeOfDay}</span>
+                                         )}
+                                         {task.description}
+                                         {task.frequency === 'Specific Days' && task.days && (
+                                             <span className="ml-2 inline-flex items-center gap-1">
+                                                 {task.days.map(d => (
+                                                     <span key={d} className="px-1.5 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-black uppercase rounded border border-slate-200">{d}</span>
+                                                 ))}
+                                             </span>
+                                         )}
+                                         {task.frequency === 'One-off' && (
+                                             <span className="ml-2 px-1.5 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-black uppercase rounded border border-slate-200">One-off</span>
+                                         )}
+                                     </span>
                                      {userRole === 'admin' && (
                                      <button 
                                        onClick={() => handleDeleteTask(task.id)}
@@ -1760,17 +2284,34 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                             </h3>
                             <button onClick={handleNextMonth} className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors">→</button>
                         </div>
-                        <div className="flex gap-2">
-                            {['Morning', 'Lunch', 'Tea', 'Evening'].map(p => (
-                                <div key={p} className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg border border-slate-100">
-                                    <div className={`w-2 h-2 rounded-full ${
-                                        p === 'Morning' ? 'bg-amber-400' : 
-                                        p === 'Lunch' ? 'bg-emerald-400' : 
-                                        p === 'Tea' ? 'bg-blue-400' : 'bg-indigo-400'
-                                    }`}></div>
-                                    <span className="text-[10px] font-bold text-slate-500 uppercase">{p}</span>
-                                </div>
-                            ))}
+                        <div className="flex gap-2 flex-wrap justify-center">
+                            <button onClick={() => setVisitPeriodFilter('All')} className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors ${visitPeriodFilter === 'All' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}>All</button>
+                            {['Morning', 'Lunch', 'Tea', 'Evening'].map(p => {
+                                const activeColor = 
+                                    p === 'Morning' ? 'bg-amber-500 text-white border-amber-500' : 
+                                    p === 'Lunch' ? 'bg-emerald-500 text-white border-emerald-500' : 
+                                    p === 'Tea' ? 'bg-blue-500 text-white border-blue-500' : 
+                                    'bg-indigo-500 text-white border-indigo-500';
+                                
+                                const dotColor = 
+                                    p === 'Morning' ? 'bg-amber-400' : 
+                                    p === 'Lunch' ? 'bg-emerald-400' : 
+                                    p === 'Tea' ? 'bg-blue-400' : 
+                                    'bg-indigo-400';
+
+                                return (
+                                    <button 
+                                        key={p} 
+                                        onClick={() => setVisitPeriodFilter(p)}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors ${
+                                            visitPeriodFilter === p ? activeColor : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                                        }`}
+                                    >
+                                        <div className={`w-2 h-2 rounded-full ${visitPeriodFilter === p ? 'bg-white' : dotColor}`}></div>
+                                        <span>{p}</span>
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -1800,52 +2341,97 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                             // Day cells
                             for (let d = 1; d <= daysInMonth; d++) {
                                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                                const dayVisits = visits.filter(v => v.date === dateStr);
+                                const dayVisits = filteredVisits.filter(v => v.date === dateStr).sort((a,b) => a.time.localeCompare(b.time));
                                 const isToday = new Date().toDateString() === new Date(year, month, d).toDateString();
 
+                                const periodsToRender = visitPeriodFilter === 'All' 
+                                    ? [
+                                        { label: 'Morning', time: '09:00' },
+                                        { label: 'Lunch', time: '13:00' },
+                                        { label: 'Tea', time: '16:00' },
+                                        { label: 'Evening', time: '19:00' }
+                                      ]
+                                    : [
+                                        { label: 'Morning', time: '09:00' },
+                                        { label: 'Lunch', time: '13:00' },
+                                        { label: 'Tea', time: '16:00' },
+                                        { label: 'Evening', time: '19:00' }
+                                      ].filter(p => p.label === visitPeriodFilter);
+
                                 days.push(
-                                    <div key={d} className={`bg-white min-h-[160px] p-2 flex flex-col group relative transition-colors hover:bg-blue-50/30 ${isToday ? 'ring-2 ring-inset ring-blue-500/20' : ''}`}>
+                                    <div key={d} className={`bg-white min-h-[180px] p-2 flex flex-col group relative transition-colors ${isToday ? 'ring-2 ring-inset ring-blue-500/20' : ''}`}>
                                         <div className="flex justify-between items-start mb-2">
                                             <span className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-black ${isToday ? 'bg-blue-600 text-white' : 'text-slate-400'}`}>{d}</span>
                                             {dayVisits.length > 0 && <span className="text-[9px] font-bold text-slate-400">{dayVisits.length} Visits</span>}
                                         </div>
                                         
-                                        <div className="flex-1 flex flex-col gap-1">
-                                            {[
-                                                { label: 'Morning', time: '09:00', color: 'bg-amber-50 text-amber-700 border-amber-100' },
-                                                { label: 'Lunch', time: '12:30', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
-                                                { label: 'Tea', time: '16:00', color: 'bg-blue-50 text-blue-700 border-blue-100' },
-                                                { label: 'Evening', time: '19:00', color: 'bg-indigo-50 text-indigo-700 border-indigo-100' }
-                                            ].map(period => {
+                                        <div className="flex-1 flex flex-col gap-1 overflow-y-auto pr-1 scrollbar-hide">
+                                            {periodsToRender.map(period => {
                                                 const periodVisits = dayVisits.filter(v => getVisitPeriod(v.time) === period.label);
                                                 
+                                                let emptyClasses = 'border-slate-100 hover:border-blue-200 hover:bg-slate-50';
+                                                let textClasses = 'text-slate-300 group-hover/slot:text-blue-400';
+
+                                                if (period.label === 'Morning') {
+                                                    emptyClasses = 'border-amber-100/50 bg-amber-50/30 hover:bg-amber-50 hover:border-amber-200';
+                                                    textClasses = 'text-amber-300 group-hover/slot:text-amber-600';
+                                                } else if (period.label === 'Lunch') {
+                                                    emptyClasses = 'border-emerald-100/50 bg-emerald-50/30 hover:bg-emerald-50 hover:border-emerald-200';
+                                                    textClasses = 'text-emerald-300 group-hover/slot:text-emerald-600';
+                                                } else if (period.label === 'Tea') {
+                                                    emptyClasses = 'border-blue-100/50 bg-blue-50/30 hover:bg-blue-50 hover:border-blue-200';
+                                                    textClasses = 'text-blue-300 group-hover/slot:text-blue-600';
+                                                } else if (period.label === 'Evening') {
+                                                    emptyClasses = 'border-indigo-100/50 bg-indigo-50/30 hover:bg-indigo-50 hover:border-indigo-200';
+                                                    textClasses = 'text-indigo-300 group-hover/slot:text-indigo-600';
+                                                }
+
                                                 return (
-                                                    <div 
-                                                        key={period.label} 
-                                                        className={`flex-1 rounded-lg border border-dashed border-slate-100 flex items-center px-2 relative group/slot transition-all hover:border-solid ${periodVisits.length > 0 ? period.color + ' border-solid' : 'hover:border-blue-200 hover:bg-white'}`}
-                                                        onClick={() => {
-                                                            if (periodVisits.length === 0 && userRole === 'admin') {
-                                                                handleOpenAddVisit(dateStr, period.time);
-                                                            }
-                                                        }}
-                                                    >
+                                                    <div key={period.label} className="flex-1 min-h-[30px] flex flex-col gap-1">
                                                         {periodVisits.length > 0 ? (
-                                                            <div className="w-full" onClick={(e) => { e.stopPropagation(); handleOpenEditVisit(periodVisits[0]); }}>
-                                                                <div className="flex justify-between items-center w-full">
-                                                                    <span className="text-[9px] font-black uppercase">{period.label}</span>
-                                                                    <span className="text-[9px] font-bold opacity-70">{periodVisits[0].time}</span>
+                                                            periodVisits.map(visit => (
+                                                                <div key={visit.id}>
+                                                                    <div 
+                                                                        className={`p-1.5 rounded-lg border cursor-pointer transition-all ${getPeriodColor(visit.time)}`}
+                                                                        onClick={(e) => { e.stopPropagation(); handleOpenEditVisit(visit); }}
+                                                                        onMouseEnter={(e) => handleVisitMouseEnter(e, visit)}
+                                                                        onMouseLeave={handleVisitMouseLeave}
+                                                                    >
+                                                                        <div className="flex justify-between items-center w-full">
+                                                                            <span className="text-[9px] font-black uppercase">{period.label}</span>
+                                                                            <span className="text-[9px] font-bold opacity-70">{visit.time}</span>
+                                                                        </div>
+                                                                        <div className="text-[9px] font-bold truncate">{visit.carer}</div>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="text-[9px] font-bold truncate">{periodVisits[0].carer}</div>
-                                                            </div>
+                                                            ))
                                                         ) : (
-                                                            <span className="text-[8px] font-black uppercase text-slate-300 w-full text-center opacity-0 group-hover/slot:opacity-100 transition-opacity cursor-pointer">
-                                                                + {period.label}
-                                                            </span>
+                                                            <div 
+                                                                className={`flex-1 rounded-lg border border-dashed flex items-center justify-center group/slot transition-all cursor-pointer ${emptyClasses}`}
+                                                                onClick={() => {
+                                                                    if (userRole === 'admin') {
+                                                                        handleOpenAddVisit(dateStr, period.time);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <span className={`text-[8px] font-black uppercase transition-colors ${textClasses}`}>
+                                                                    {period.label}
+                                                                </span>
+                                                            </div>
                                                         )}
                                                     </div>
                                                 );
                                             })}
                                         </div>
+                                        {userRole === 'admin' && (
+                                            <button 
+                                                onClick={() => handleOpenAddVisit(dateStr)}
+                                                className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg font-light opacity-0 group-hover:opacity-100 transition-opacity hover:bg-blue-600"
+                                                title="Add Visit"
+                                            >
+                                                +
+                                            </button>
+                                        )}
                                     </div>
                                 );
                             }
@@ -1864,20 +2450,59 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                       <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Structured Oversight for CQC Audits</p>
                    </div>
                    {userRole === 'admin' && (
-                   <button onClick={() => setIsAddingNote(true)} className="bg-white text-slate-900 px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95 border border-slate-200 hover:bg-slate-50">+ New Structured Note</button>
+                   <button onClick={() => setIsAddingNote(true)} className="bg-white text-slate-900 px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95 border border-slate-200 hover:bg-slate-50">+ Add Log</button>
                    )}
                 </div>
-                {/* ... Filter Bar & Note List ... */}
+                
+                {/* Filter Bar */}
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                    {['All', 'General', 'Alert', 'Incident', 'Visit Log', 'Action', 'Concern'].map(type => (
+                        <button 
+                            key={type}
+                            onClick={() => setNoteFilter(type)}
+                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all whitespace-nowrap ${noteFilter === type ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
+                        >
+                            {type}
+                        </button>
+                    ))}
+                </div>
+
                 <div className="space-y-6">
                    {filteredNotes.length > 0 ? filteredNotes.map((note) => (
-                     <div key={note.id} className={`bg-white border border-slate-200 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-md transition-shadow ${note.isCqcEvidence ? 'ring-2 ring-blue-500/20' : ''}`}>
+                     <div key={note.id} className={`bg-white border border-slate-200 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-md transition-shadow ${note.isCqcEvidence ? 'ring-2 ring-blue-500/20' : ''} ${note.isPinned ? 'border-blue-200 ring-1 ring-blue-100' : ''}`}>
                         <div className="px-6 md:px-10 py-6 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-50 gap-4">
                            <div className="flex items-center gap-4">
                               <span className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase border ${getNoteColor(note.category)}`}>{note.category}</span>
                               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{new Date(note.date).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
                            </div>
-                           <div className="flex gap-3">
+                           <div className="flex gap-3 items-center">
+                              {(['Concern', 'Incident', 'Action', 'Alert'].includes(note.category)) && (
+                                  <select
+                                      value={note.status || 'Open'}
+                                      onChange={(e) => handleUpdateStatus(note.id, e.target.value)}
+                                      className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase border outline-none cursor-pointer transition-colors ${
+                                          note.status === 'Resolved' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                                          note.status === 'In Progress' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                                          note.status === 'Investigating' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                          'bg-white text-slate-500 border-slate-200'
+                                      }`}
+                                  >
+                                      <option value="Open">Open</option>
+                                      <option value="Investigating">Investigating</option>
+                                      <option value="In Progress">In Progress</option>
+                                      <option value="Resolved">Resolved</option>
+                                  </select>
+                              )}
                               {note.isCqcEvidence && <span className="px-3 py-1 bg-blue-600 text-white text-[8px] font-black uppercase rounded-full">CQC Evidence</span>}
+                              {userRole === 'admin' && (
+                                <button 
+                                    onClick={() => handleTogglePin(note.id)}
+                                    className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${note.isPinned ? 'bg-blue-100 text-blue-600' : 'text-slate-300 hover:bg-slate-100 hover:text-slate-500'}`}
+                                    title={note.isPinned ? "Unpin Log" : "Pin Log"}
+                                >
+                                    📌
+                                </button>
+                              )}
                            </div>
                         </div>
                         <div className="p-6 md:p-10 flex flex-col md:flex-row gap-8 md:gap-12">
@@ -1967,6 +2592,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
       </div>
 
       {/* COMPLIANCE SIDEBAR */}
+      {activeSubTab === 'Overview' && (
       <div className="w-full lg:w-96 bg-white border-l border-slate-200 p-6 md:p-10 space-y-12 overflow-y-auto scrollbar-hide shrink-0">
          <div className="bg-white rounded-[2.5rem] p-8 md:p-10 text-slate-900 relative overflow-hidden shadow-2xl border border-slate-100">
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/10 rounded-full"></div>
@@ -2020,6 +2646,241 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
          )}
          {/* ... Governance KPIs ... */}
       </div>
+      )}
+
+      {/* VISIT MODAL */}
+      {visitModal.isOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/20 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white rounded-[2.5rem] max-w-lg w-full shadow-2xl border border-slate-100 animate-in zoom-in-95 max-h-[90vh] flex flex-col overflow-hidden">
+                <div className="p-8 overflow-y-auto">
+                <h3 className="text-2xl font-black text-slate-900 mb-6">{visitModal.mode === 'add' ? 'Schedule Visit' : 'Edit Visit'}</h3>
+                
+                <div className="space-y-6">
+                    {/* Type Selection */}
+                    <div className="bg-slate-50 p-1 rounded-xl flex">
+                        <button 
+                            onClick={() => setVisitForm({...visitForm, type: 'Recurring'})}
+                            className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${visitForm.type === 'Recurring' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                        >
+                            Rota (Recurring)
+                        </button>
+                        <button 
+                            onClick={() => setVisitForm({...visitForm, type: 'One-off'})}
+                            className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${visitForm.type === 'One-off' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                        >
+                            One-off
+                        </button>
+                    </div>
+
+                    {/* Date & Carer */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Start Date</label>
+                            <input type="date" value={visitForm.date} onChange={(e) => setVisitForm({...visitForm, date: e.target.value})} className="w-full mt-1 bg-slate-50 border-slate-200 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20" />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Carer</label>
+                            <select value={visitForm.carer} onChange={(e) => setVisitForm({...visitForm, carer: e.target.value})} className="w-full mt-1 bg-slate-50 border-slate-200 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20">
+                                <option value="">Select...</option>
+                                {staff.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
+                            </select>
+                        </div>
+                        <div className="col-span-2 space-y-4 pt-2">
+                            <div>
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Base Carers Required</label>
+                                <div className="flex gap-2 mt-1">
+                                    {['1', '2'].map(num => (
+                                        <button
+                                            key={num}
+                                            onClick={() => setVisitForm({ ...visitForm, carerCount: num })}
+                                            className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest border transition-all ${
+                                                visitForm.carerCount === num 
+                                                    ? 'bg-blue-600 text-white border-blue-600 shadow-md' 
+                                                    : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                                            }`}
+                                        >
+                                            {num} Carer{num > 1 ? 's' : ''}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Additional Support</label>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs font-bold text-slate-700">Add Extra Carer</span>
+                                        <button 
+                                            onClick={() => setVisitForm({ ...visitForm, hasAdditionalCarer: !visitForm.hasAdditionalCarer })}
+                                            className={`w-10 h-6 rounded-full transition-colors relative ${visitForm.hasAdditionalCarer ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                                        >
+                                            <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${visitForm.hasAdditionalCarer ? 'translate-x-4' : ''}`} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {visitForm.hasAdditionalCarer && (
+                                    <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 pt-2 border-t border-slate-200">
+                                        <div>
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Type</label>
+                                            <select 
+                                                value={visitForm.additionalCarerType} 
+                                                onChange={(e) => setVisitForm({...visitForm, additionalCarerType: e.target.value})}
+                                                className="w-full mt-1 bg-white border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-emerald-500/20"
+                                            >
+                                                <option value="Shadowing">Shadowing</option>
+                                                <option value="Induction">Induction</option>
+                                                <option value="Training">Training</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pay Rate (£/hr)</label>
+                                            <input 
+                                                type="number" 
+                                                value={visitForm.additionalPayRate} 
+                                                onChange={(e) => setVisitForm({...visitForm, additionalPayRate: e.target.value})}
+                                                className="w-full mt-1 bg-white border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-emerald-500/20"
+                                                placeholder="0.00"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Start & Finish Time */}
+                    <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Start Time</label>
+                                <select 
+                                    value={visitForm.time} 
+                                    onChange={(e) => setVisitForm({...visitForm, time: e.target.value})} 
+                                    className="w-full mt-1 bg-slate-50 border-slate-200 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20"
+                                >
+                                    <option value="">Select Time</option>
+                                    {timeOptions.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Finish Time</label>
+                                <select 
+                                    value={visitForm.endTime} 
+                                    onChange={(e) => setVisitForm({...visitForm, endTime: e.target.value})} 
+                                    className="w-full mt-1 bg-slate-50 border-slate-200 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20"
+                                >
+                                    <option value="">Select Time</option>
+                                    {timeOptions.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        {/* Quick Duration Helpers */}
+                        <div className="flex gap-2 flex-wrap">
+                            {[15, 30, 45, 60, 90, 120].map(mins => (
+                                <button
+                                    key={mins}
+                                    type="button"
+                                    onClick={() => {
+                                        if (!visitForm.time) return;
+                                        const [h, m] = visitForm.time.split(':').map(Number);
+                                        const date = new Date();
+                                        date.setHours(h);
+                                        date.setMinutes(m + mins);
+                                        const newEndTime = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+                                        setVisitForm({...visitForm, endTime: newEndTime});
+                                    }}
+                                    className="px-3 py-1.5 bg-slate-100 hover:bg-blue-50 text-slate-500 hover:text-blue-600 text-[10px] font-black uppercase rounded-lg transition-colors border border-slate-200 hover:border-blue-200"
+                                >
+                                    +{mins}m
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Visit Notes */}
+                    <div>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Visit Notes (For Carer)</label>
+                        <textarea
+                            value={visitForm.note}
+                            onChange={(e) => setVisitForm({...visitForm, note: e.target.value})}
+                            className="w-full mt-1 bg-slate-50 border-slate-200 rounded-xl p-3 font-medium text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20 min-h-[80px]"
+                            placeholder="Enter any specific instructions or notes for this visit..."
+                        />
+                    </div>
+
+                    {/* Visit Tasks */}
+                    <div>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tasks for this visit</label>
+                        <div className="mt-2 space-y-2 max-h-40 overflow-y-auto bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            {client.tasks && client.tasks.length > 0 ? client.tasks.map(task => (
+                                <div key={task.id} className="flex items-center">
+                                    <input
+                                        id={`visit-task-${task.id}`}
+                                        type="checkbox"
+                                        checked={visitForm.tasks.includes(task.description)}
+                                        onChange={(e) => {
+                                            const taskDesc = task.description;
+                                            if (e.target.checked) {
+                                                setVisitForm(vf => ({ ...vf, tasks: [...vf.tasks, taskDesc] }));
+                                            } else {
+                                                setVisitForm(vf => ({ ...vf, tasks: vf.tasks.filter(t => t !== taskDesc) }));
+                                            }
+                                        }}
+                                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <label htmlFor={`visit-task-${task.id}`} className="ml-3 text-sm font-medium text-gray-700">{task.description}</label>
+                                </div>
+                            )) : (
+                                <p className="text-xs text-slate-400 italic p-2">No tasks defined for this client. Add tasks in the 'Tasks' tab.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Recurring Options */}
+                    {visitForm.type === 'Recurring' && (
+                        <div className="space-y-4 bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+                            <div>
+                                <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Frequency</label>
+                                <select value={visitForm.frequency} onChange={(e) => setVisitForm({...visitForm, frequency: e.target.value})} className="w-full mt-1 bg-white border-blue-200 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20">
+                                    <option value="Daily">Daily</option>
+                                    <option value="Weekly">Weekly</option>
+                                </select>
+                            </div>
+                            {visitForm.frequency === 'Weekly' && (
+                                <div>
+                                    <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 block">Days of Week</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                                            <button
+                                                key={day}
+                                                onClick={() => {
+                                                    const days = visitForm.selectedDays.includes(day)
+                                                        ? visitForm.selectedDays.filter(d => d !== day)
+                                                        : [...visitForm.selectedDays, day];
+                                                    setVisitForm({...visitForm, selectedDays: days});
+                                                }}
+                                                className={`w-10 h-10 rounded-xl text-[10px] font-black uppercase transition-all ${visitForm.selectedDays.includes(day) ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-white text-slate-400 border border-blue-100 hover:border-blue-300'}`}
+                                            >
+                                                {day}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex gap-3 mt-8">
+                    <button onClick={() => setVisitModal({ ...visitModal, isOpen: false })} className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">Cancel</button>
+                    <button onClick={handleSaveVisit} className="flex-1 py-4 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">Save Schedule</button>
+                </div>
+                </div>
+            </div>
+        </div>
+      )}
 
       {/* CONFIRMATION MODAL */}
       {confirmModal.isOpen && (
@@ -2136,13 +2997,176 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                 <div className="absolute top-0 left-0 right-0 h-32 bg-blue-600"></div>
                 <div className="relative z-10">
                     <div className="w-40 h-40 bg-white rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-xl p-4">
-                        <img src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`https://portal.apexcare.com/client/${client.id}`)}&color=0f172a&bgcolor=ffffff`} alt="QR Code" className="w-full h-full object-contain" />
+                        <img src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${emergencyQrData}&color=0f172a&bgcolor=ffffff`} alt="QR Code" className="w-full h-full object-contain" />
                     </div>
                     <h3 className="text-2xl font-black text-slate-900 mb-1">{client.firstName} {client.lastName}</h3>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Scan for Direct Profile Access</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Scan for Emergency Snapshot</p>
                     <div className="flex gap-3">
                         <button onClick={() => setShowQrModal(false)} className="flex-1 py-3 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-colors">Close</button>
                     </div>
+                </div>
+            </div>
+        </div>
+      )}
+
+      {/* ASSESSMENT SELECTOR MODAL */}
+      {showAssessmentSelector && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/20 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white rounded-[2rem] p-8 max-w-md w-full shadow-2xl border border-slate-100 animate-in zoom-in-95">
+                <h3 className="text-xl font-black text-slate-900 mb-6">Select Assessment</h3>
+                <div className="space-y-3">
+                    {Object.keys(assessmentDefinitions).map(name => (
+                        <button key={name} onClick={() => handleStartAssessment(name)} className="w-full p-4 text-left bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-xl transition-colors">
+                            <span className="font-bold text-slate-900">{name}</span>
+                        </button>
+                    ))}
+                </div>
+                <button onClick={() => setShowAssessmentSelector(false)} className="mt-6 w-full py-3 bg-slate-100 text-slate-500 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">Cancel</button>
+            </div>
+        </div>
+      )}
+
+      {/* ACTIVE ASSESSMENT MODAL */}
+      {activeAssessment && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/20 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white rounded-[2rem] p-8 max-w-2xl w-full shadow-2xl border border-slate-100 animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+                <h3 className="text-2xl font-black text-slate-900 mb-2">{activeAssessment}</h3>
+                <p className="text-slate-500 font-medium mb-8">Complete the assessment below.</p>
+                
+                <div className="space-y-6">
+                    {assessmentDefinitions[activeAssessment].questions.map(q => (
+                        <div key={q.id} className="space-y-2">
+                            <label className="text-sm font-bold text-slate-900">{q.label}</label>
+                            <select 
+                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20"
+                                value={assessmentAnswers[q.id] || ''}
+                                onChange={(e) => setAssessmentAnswers({...assessmentAnswers, [q.id]: e.target.value})}
+                            >
+                                <option value="">Select...</option>
+                                {q.options.map((opt, idx) => (
+                                    <option key={idx} value={idx}>{opt.label} (Score: {opt.score})</option>
+                                ))}
+                            </select>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="flex gap-3 mt-8">
+                    <button onClick={() => setActiveAssessment(null)} className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">Cancel</button>
+                    <button onClick={handleSaveAssessmentResult} className="flex-1 py-4 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">Complete Assessment</button>
+                </div>
+            </div>
+        </div>
+      )}
+
+      {/* VIEW ASSESSMENT MODAL */}
+      {viewingAssessment && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/20 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white rounded-[2rem] p-8 max-w-2xl w-full shadow-2xl border border-slate-100 animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 className="text-2xl font-black text-slate-900">{viewingAssessment.name}</h3>
+                        <p className="text-sm font-bold text-slate-500">Completed by {viewingAssessment.author} on {new Date(viewingAssessment.date).toLocaleDateString('en-GB')}</p>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Score</p>
+                        <p className="text-xl font-black text-blue-600">{viewingAssessment.score}</p>
+                    </div>
+                </div>
+                
+                <div className="space-y-4 bg-slate-50 rounded-2xl p-6 border border-slate-200">
+                    {viewingAssessment.details ? viewingAssessment.details.map((detail, idx) => (
+                        <div key={idx} className="flex justify-between items-center border-b border-slate-200 last:border-0 pb-3 last:pb-0">
+                            <p className="text-sm font-bold text-slate-700">{detail.question}</p>
+                            <p className="text-sm font-medium text-slate-900 text-right">{detail.answer} <span className="text-slate-400 text-xs">({detail.score})</span></p>
+                        </div>
+                    )) : <p className="text-sm text-slate-500 italic">No detailed breakdown available for this record.</p>}
+                </div>
+
+                <button onClick={() => setViewingAssessment(null)} className="mt-8 w-full py-3 bg-slate-100 text-slate-500 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">Close</button>
+            </div>
+        </div>
+      )}
+
+      {/* HOVER VISIT MODAL - RENDERED AT ROOT LEVEL */}
+      {hoveredVisit && hoveredVisitPosition && (
+        <div 
+            className="fixed w-72 bg-slate-800 text-white p-4 rounded-xl shadow-2xl transition-opacity pointer-events-none z-[210] animate-in fade-in-5"
+            style={{
+                top: `${hoveredVisitPosition.top}px`,
+                left: `${hoveredVisitPosition.left}px`,
+                transform: 'translate(-50%, -100%) translateY(-0.5rem)',
+            }}
+        >
+            <h4 className="font-black text-sm mb-2 border-b border-slate-700 pb-2">{hoveredVisit.time} - {hoveredVisit.carer}</h4>
+            <div className="space-y-3 text-xs max-h-48 overflow-y-auto">
+                <div>
+                    <p className="font-bold text-slate-400 uppercase text-[9px] tracking-widest">Notes</p>
+                    <p className="font-medium text-slate-200 whitespace-pre-wrap">{hoveredVisit.note || 'No notes.'}</p>
+                </div>
+                <div>
+                    <p className="font-bold text-slate-400 uppercase text-[9px] tracking-widest">Tasks</p>
+                    {hoveredVisit.tasks && hoveredVisit.tasks.length > 0 ? (
+                        <ul className="list-disc list-inside pl-1 space-y-1 mt-1">
+                            {hoveredVisit.tasks.map((task, i) => <li key={i} className="font-medium text-slate-200">{task}</li>)}
+                        </ul>
+                    ) : (
+                        <p className="font-medium text-slate-300 italic">No specific tasks.</p>
+                    )}
+                </div>
+            </div>
+            <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-slate-800"></div>
+        </div>
+      )}
+
+      {/* ADD NOTE MODAL */}
+      {isAddingNote && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/20 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white rounded-[2.5rem] p-8 max-w-lg w-full shadow-2xl border border-slate-100 animate-in zoom-in-95">
+                <h3 className="text-2xl font-black text-slate-900 mb-6">Add New Log</h3>
+                
+                <div className="space-y-6">
+                    <div>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Log Type</label>
+                        <select 
+                            value={newNote.category} 
+                            onChange={(e) => setNewNote({...newNote, category: e.target.value})}
+                            className="w-full mt-1 bg-slate-50 border-slate-200 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20"
+                        >
+                            <option value="General">General Note</option>
+                            <option value="Alert">Alert</option>
+                            <option value="Incident">Incident</option>
+                            <option value="Visit Log">Visit Log</option>
+                            <option value="Action">Action Required</option>
+                            <option value="Concern">Concern</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Content</label>
+                        <textarea 
+                            value={newNote.content} 
+                            onChange={(e) => setNewNote({...newNote, content: e.target.value})}
+                            className="w-full mt-1 bg-slate-50 border-slate-200 rounded-xl p-3 font-medium text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20 min-h-[120px]"
+                            placeholder="Enter log details..."
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <input 
+                            type="checkbox" 
+                            id="cqcEvidence" 
+                            checked={newNote.isCqc} 
+                            onChange={(e) => setNewNote({...newNote, isCqc: e.target.checked})}
+                            className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <label htmlFor="cqcEvidence" className="text-sm font-bold text-slate-700">Mark as CQC Evidence</label>
+                    </div>
+                </div>
+
+                <div className="flex gap-3 mt-8">
+                    <button onClick={() => setIsAddingNote(false)} className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">Cancel</button>
+                    <button onClick={handleAddNote} className="flex-1 py-4 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">Save Log</button>
                 </div>
             </div>
         </div>

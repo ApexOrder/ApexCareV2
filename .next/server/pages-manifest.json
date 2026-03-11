@@ -2,8 +2,7 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
+  "/login": "pages/login.js",
   "/admin": "pages/admin.js",
-  "/patient-management": "pages/patient-management.js",
-  "/": "pages/index.js",
-  "/login": "pages/login.js"
+  "/patient-management": "pages/patient-management.js"
 }
