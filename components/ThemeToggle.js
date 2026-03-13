@@ -1,0 +1,42 @@
+import React, { useEffect, useState } from 'react';
+import { Moon, Sun } from 'lucide-react';
+
+const ThemeToggle = ({ className = "", collapsed = false }) => {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    // Check for saved user preference, if any, on mount
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      setIsDark(true);
+      document.documentElement.classList.add('dark');
+    } else {
+      setIsDark(false);
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (isDark) {
+      document.documentElement.classList.remove('dark');
+      localStorage.theme = 'light';
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.theme = 'dark';
+      setIsDark(true);
+    }
+  };
+
+  return (
+    <button
+      onClick={toggleTheme}
+      className={`flex items-center justify-center p-3 rounded-xl transition-all duration-300 ${isDark ? 'bg-slate-800 text-amber-400 shadow-lg shadow-slate-900/50 border border-slate-700' : 'bg-white text-slate-400 border border-slate-200 shadow-sm hover:text-amber-500'} ${className}`}
+      title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+    >
+      {isDark ? <Sun size={20} strokeWidth={2.5} /> : <Moon size={20} strokeWidth={2.5} />}
+      {!collapsed && <span className="ml-3 font-bold text-xs uppercase tracking-widest lg:hidden lg:group-hover:inline transition-all">{isDark ? 'Light Mode' : 'Dark Mode'}</span>}
+    </button>
+  );
+};
+
+export default ThemeToggle;

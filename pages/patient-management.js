@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { Search, Filter, Plus, Users, ChevronRight, User, X } from 'lucide-react';
 import ClientProfileView from '../components/ClientProfileView';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function ServiceUserManagement() {
   const [serviceUsers, setServiceUsers] = useState([
     { 
       id: 1, 
+      clientCode: '84920153',
       title: 'Mr',
       firstName: 'James',
       lastName: 'Miller',
@@ -112,6 +115,199 @@ I would like my carers to provide meal support on each visit. I would like these
         isDue: true
       }
     },
+    {
+      id: 2,
+      clientCode: '92837461',
+      title: 'Mrs',
+      firstName: 'Eleanor',
+      lastName: 'Rigby',
+      name: 'Eleanor Rigby',
+      preferredName: 'Ellie',
+      dob: '1942-06-20',
+      gender: 'Female',
+      pronouns: 'She/Her',
+      address: '123 Penny Lane, Liverpool, L18 1BW',
+      phone: '(555) 867-5309',
+      email: 'eleanor.rigby@email.com',
+      nhsNumber: '987 654 3210',
+      pidNumber: 'LA-112233',
+      area: 'South Springfield',
+      auditStatus: 'Pending Review',
+      careLevel: 'Medium',
+      pocType: 'Reablement',
+      serviceStartDate: '2023-11-01',
+      ageBand: '80-89',
+      regulatedCare: 'Yes',
+      languages: 'English',
+      religion: 'None',
+      emergencyContact: 'Father McKenzie (Friend) - (555) 111-0000',
+      gp: {
+        name: 'Dr. Robert',
+        surgery: 'Liverpool Health Centre',
+        phone: '(555) 222-3333',
+        address: '456 Health St'
+      },
+      pharmacy: {
+        name: 'Penny Lane Pharmacy',
+        phone: '(555) 444-5555',
+        address: '124 Penny Lane'
+      },
+      powerOfAttorney: 'Father McKenzie (Finance)',
+      condition: 'Early-stage Dementia',
+      pmh: ['Dementia', 'Arthritis', 'Glaucoma'],
+      medications: [
+        { name: 'Donepezil', dosage: '10mg' },
+        { name: 'Paracetamol', dosage: '500mg' }
+      ],
+      allergies: ['Peanuts'],
+      mobility: {
+        level: 'Independent with stick',
+        riskOfFalls: 'Medium'
+      },
+      nutrition: {
+        dietaryType: 'Level 7 - Regular',
+        preferences: 'Vegetarian. Likes sweet treats.',
+        chokingRisk: false
+      },
+      legal: {
+        dnacpr: false,
+        respecStatus: 'Not in place',
+        dnacprLocation: '',
+        respecLocation: ''
+      },
+      environment: {
+        accessCode: '1966',
+        keySafeLocation: 'Front porch',
+        hazards: ['Clutter'],
+        lifeline: 'No',
+        pets: 'None'
+      },
+      social: {
+        lifeStory: 'Eleanor lived a quiet life working at the local church. She enjoys knitting and watching the world go by.',
+        hobbies: ['Knitting', 'Church activities']
+      },
+      preferences: {
+        carerGender: 'Female',
+        carerVibe: 'Chatty/Friendly'
+      },
+      insuranceProvider: 'Private',
+      policyNumber: 'PR-12345678',
+      status: 'Active',
+      group: 'Floor 2',
+      groups: ['Floor 2'],
+      visits: [],
+      nextOfKin: 'Father McKenzie (Friend)',
+      careNotes: [],
+      tasks: [],
+      documents: [],
+      editHistory: [],
+      wellbeingScore: 72,
+      nextReviewDate: '2024-05-15',
+      arrivalNote: 'Ring doorbell loudly.',
+      bigThing: 'Can become anxious in evenings.',
+      medicationModuleActive: true,
+      medicationStats: {
+        lastOrdered: '01 Nov 2023',
+        nextOrderDue: '29 Nov 2023',
+        isDue: false
+      }
+    },
+    {
+      id: 3,
+      clientCode: '73629104',
+      title: 'Mr',
+      firstName: 'Arthur',
+      lastName: 'Dent',
+      name: 'Arthur Dent',
+      preferredName: 'Art',
+      dob: '1978-03-11',
+      gender: 'Male',
+      pronouns: 'He/Him',
+      address: '155 Country Lane, Cottington, CT1 2XX',
+      phone: '(555) 424-2424',
+      email: 'arthur.dent@email.com',
+      nhsNumber: '424 242 4242',
+      pidNumber: 'LA-424242',
+      area: 'West Springfield',
+      auditStatus: 'Compliant',
+      careLevel: 'Low',
+      pocType: 'Intermediate Care',
+      serviceStartDate: '2024-01-01',
+      ageBand: '40-49',
+      regulatedCare: 'No',
+      languages: 'English',
+      religion: 'Agnostic',
+      emergencyContact: 'Ford Prefect (Friend) - (555) 420-0000',
+      gp: {
+        name: 'Dr. Adams',
+        surgery: 'Galaxy Medical',
+        phone: '(555) 999-9999',
+        address: '42 Milky Way'
+      },
+      pharmacy: {
+        name: 'Vogon Pharma',
+        phone: '(555) 666-6666',
+        address: 'Sector ZZ9'
+      },
+      powerOfAttorney: 'None',
+      condition: 'General Anxiety & Mild Depression',
+      pmh: ['Anxiety', 'Insomnia'],
+      medications: [
+        { name: 'Sertraline', dosage: '50mg' }
+      ],
+      allergies: ['None'],
+      mobility: {
+        level: 'Independent',
+        riskOfFalls: 'Low'
+      },
+      nutrition: {
+        dietaryType: 'Regular',
+        preferences: 'Likes tea (a lot). Sandwiches.',
+        chokingRisk: false
+      },
+      legal: {
+        dnacpr: false,
+        respecStatus: 'Not in place',
+        dnacprLocation: '',
+        respecLocation: ''
+      },
+      environment: {
+        accessCode: '0042',
+        keySafeLocation: 'Rear Garden',
+        hazards: ['Bulldozers outside'],
+        lifeline: 'No',
+        pets: 'None'
+      },
+      social: {
+        lifeStory: 'Arthur is a simple man who enjoys a quiet life. Recently had some property disputes.',
+        hobbies: ['Reading', 'Travel', 'Tea drinking']
+      },
+      preferences: {
+        carerGender: 'Any',
+        carerVibe: 'Professional/Quiet'
+      },
+      insuranceProvider: 'None',
+      policyNumber: '',
+      status: 'Active',
+      group: 'High Priority',
+      groups: ['High Priority'],
+      visits: [],
+      nextOfKin: 'Ford Prefect (Friend)',
+      careNotes: [],
+      tasks: [],
+      documents: [],
+      editHistory: [],
+      wellbeingScore: 60,
+      nextReviewDate: '2024-07-01',
+      arrivalNote: 'Don\'t mention the house demolition.',
+      bigThing: 'Needs reassurance.',
+      medicationModuleActive: true,
+      medicationStats: {
+        lastOrdered: '10 Jan 2024',
+        nextOrderDue: '07 Feb 2024',
+        isDue: false
+      }
+    }
   ]);
   const [availableGroups, setAvailableGroups] = useState(['Floor 1', 'Floor 2', 'High Priority']);
   const [areas] = useState([
@@ -205,6 +401,20 @@ I would like my carers to provide meal support on each visit. I would like these
     return () => clearTimeout(timer);
   }, [addressSearch]);
 
+  const generateClientCode = () => {
+    return Math.floor(10000000 + Math.random() * 90000000).toString();
+  };
+
+  const getPocColor = (type) => {
+    switch (type) {
+      case 'Reablement': return '#10b981'; // Emerald
+      case 'Long Term': return '#3b82f6'; // Blue
+      case 'FastTrack/EOL': return '#f43f5e'; // Rose
+      case 'Intermediate Care': return '#f59e0b'; // Amber
+      default: return '#94a3b8'; // Slate
+    }
+  };
+
   const handleSelectAddress = (suggestion) => {
     ignoreSearch.current = true;
     const addr = suggestion.address;
@@ -253,7 +463,7 @@ I would like my carers to provide meal support on each visit. I would like these
 
   const handleAddServiceUser = (e) => {
     e.preventDefault();
-    setServiceUsers([...serviceUsers, { ...newServiceUser, id: Date.now() }]);
+    setServiceUsers([...serviceUsers, { ...newServiceUser, id: Date.now(), clientCode: generateClientCode() }]);
     setNewServiceUser({ 
       name: '', 
       preferredName: '',
@@ -349,17 +559,18 @@ I would like my carers to provide meal support on each visit. I would like these
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
+        <div className="mx-auto max-w-[100rem] px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-between">
             <div className="flex">
               <div className="flex flex-shrink-0 items-center">
-                <Link href="/dashboard" className="text-xl font-bold text-gray-900">ApexCare V2</Link>
+                <Link href="/dashboard" className="text-xl font-black text-slate-900 dark:text-white">ApexCare V2</Link>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="text-sm font-medium text-gray-500 hover:text-gray-700">
+              <ThemeToggle />
+              <Link href="/dashboard" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900">
                 Back to Dashboard
               </Link>
             </div>
@@ -368,29 +579,45 @@ I would like my carers to provide meal support on each visit. I would like these
       </nav>
 
       <div className="py-10">
-        <header>
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">Service User Management</h1>
+        <header className="mb-8">
+          <div className="mx-auto max-w-[100rem] px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">Service User Management</h1>
+              <p className="text-sm font-bold text-slate-500 mt-1">Manage profiles, care plans, and service details.</p>
+            </div>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+              className={`rounded-xl px-6 py-3 text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center gap-2 ${showForm ? 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700' : 'bg-blue-600 text-white shadow-blue-200 hover:bg-blue-700'}`}
             >
-              {showForm ? 'Cancel' : 'Add Service User'}
+              {showForm ? <><X size={14} /> Cancel</> : <><Plus size={14} /> Add Service User</>}
             </button>
           </div>
         </header>
         <main>
-          <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[100rem] sm:px-6 lg:px-8">
             <div className="px-4 py-8 sm:px-0">
               
-              <div className="mb-6 flex justify-end">
-                <div className="flex items-center gap-2">
-                  <label htmlFor="pocFilter" className="text-sm font-medium text-gray-700">Filter by POC Type:</label>
+              <div className="mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="relative w-full sm:w-96">
+                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                      <Search size={16} />
+                   </div>
+                   <input 
+                      type="text" 
+                      placeholder="Search service users..." 
+                      className="pl-10 w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl py-3 text-sm font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400" 
+                   />
+                </div>
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div className="flex items-center gap-2 px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500">
+                    <Filter size={14} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Filter:</span>
+                  </div>
                   <select
                     id="pocFilter"
                     value={pocTypeFilter}
                     onChange={(e) => setPocTypeFilter(e.target.value)}
-                    className="block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 bg-white"
+                    className="block w-full sm:w-auto rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-xs font-bold py-3 pl-3 pr-10 bg-white dark:bg-slate-800 dark:text-white cursor-pointer"
                   >
                     <option value="All">All Types</option>
                     <option value="Reablement">Reablement</option>
@@ -402,16 +629,16 @@ I would like my carers to provide meal support on each visit. I would like these
               </div>
               
               {showForm && (
-                <div className="mb-8 bg-white shadow sm:rounded-lg p-6">
-                  <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">Add New Service User</h3>
+                <div className="mb-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-[2.5rem] p-8 animate-in fade-in slide-in-from-top-4">
+                  <h3 className="text-xl font-black leading-6 text-slate-900 dark:text-white mb-6">Add New Service User</h3>
                   <form onSubmit={handleAddServiceUser} className="space-y-4">
                     <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                       {/* Section: Personal Details */}
-                      <div className="sm:col-span-6 border-b border-gray-200 pb-2 mb-2">
-                        <h4 className="text-lg font-medium text-gray-900">Personal Details</h4>
+                      <div className="sm:col-span-6 border-b border-slate-100 pb-2 mb-2">
+                        <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Personal Details</h4>
                       </div>
                       <div className="sm:col-span-6">
-                        <label htmlFor="profileImage" className="block text-sm font-medium text-gray-700">Profile Image</label>
+                        <label htmlFor="profileImage" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Profile Image</label>
                         <div className="mt-1 flex items-center gap-4">
                           {newServiceUser.profileImage && (
                             <img src={newServiceUser.profileImage} alt="Preview" className="h-12 w-12 rounded-full object-cover" />
@@ -429,35 +656,35 @@ I would like my carers to provide meal support on each visit. I would like these
                         <p className="mt-1 text-xs text-gray-500">JPG or PNG only. Max 2MB.</p>
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
+                        <label htmlFor="name" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Full Name</label>
                         <input type="text" name="name" id="name" required
                           value={newServiceUser.name}
                           onChange={(e) => setNewServiceUser({...newServiceUser, name: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" 
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none" 
                         />
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="preferredName" className="block text-sm font-medium text-gray-700">Preferred Name</label>
+                        <label htmlFor="preferredName" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Preferred Name</label>
                         <input type="text" name="preferredName" id="preferredName"
                           value={newServiceUser.preferredName}
                           onChange={(e) => setNewServiceUser({...newServiceUser, preferredName: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" 
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none" 
                         />
                       </div>
                       <div className="sm:col-span-2">
-                        <label htmlFor="dob" className="block text-sm font-medium text-gray-700">Date of Birth</label>
+                        <label htmlFor="dob" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Date of Birth</label>
                         <input type="date" name="dob" id="dob" required
                           value={newServiceUser.dob}
                           onChange={(e) => setNewServiceUser({...newServiceUser, dob: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
-                        <label htmlFor="gender" className="block text-sm font-medium text-gray-700">Gender</label>
+                        <label htmlFor="gender" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Gender</label>
                         <select id="gender" name="gender"
                           value={newServiceUser.gender}
                           onChange={(e) => setNewServiceUser({...newServiceUser, gender: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none bg-white"
                         >
                           <option value="">Select...</option>
                           <option>Male</option>
@@ -466,35 +693,35 @@ I would like my carers to provide meal support on each visit. I would like these
                         </select>
                       </div>
                       <div className="sm:col-span-2">
-                        <label htmlFor="pronouns" className="block text-sm font-medium text-gray-700">Pronouns</label>
+                        <label htmlFor="pronouns" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Pronouns</label>
                         <input type="text" name="pronouns" id="pronouns"
                           value={newServiceUser.pronouns}
                           onChange={(e) => setNewServiceUser({...newServiceUser, pronouns: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="languages" className="block text-sm font-medium text-gray-700">Languages Spoken</label>
+                        <label htmlFor="languages" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Languages Spoken</label>
                         <input type="text" name="languages" id="languages"
                           value={newServiceUser.languages}
                           onChange={(e) => setNewServiceUser({...newServiceUser, languages: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="religion" className="block text-sm font-medium text-gray-700">Religion/Spirituality</label>
+                        <label htmlFor="religion" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Religion/Spirituality</label>
                         <input type="text" name="religion" id="religion"
                           value={newServiceUser.religion}
                           onChange={(e) => setNewServiceUser({...newServiceUser, religion: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status</label>
+                        <label htmlFor="status" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</label>
                         <select id="status" name="status"
                           value={newServiceUser.status}
                           onChange={(e) => setNewServiceUser({...newServiceUser, status: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none bg-white"
                         >
                           <option>Active</option>
                           <option>Inactive</option>
@@ -502,11 +729,11 @@ I would like my carers to provide meal support on each visit. I would like these
                       </div>
 
                       <div className="sm:col-span-3">
-                        <label htmlFor="pocType" className="block text-sm font-medium text-gray-700">POC Type</label>
+                        <label htmlFor="pocType" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">POC Type</label>
                         <select id="pocType" name="pocType"
                           value={newServiceUser.pocType}
                           onChange={(e) => setNewServiceUser({...newServiceUser, pocType: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none bg-white"
                         >
                           <option value="">Select...</option>
                           <option>Reablement</option>
@@ -517,11 +744,11 @@ I would like my carers to provide meal support on each visit. I would like these
                       </div>
 
                       <div className="sm:col-span-6">
-                        <label htmlFor="group" className="block text-sm font-medium text-gray-700">Group</label>
+                        <label htmlFor="group" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Group</label>
                         <select id="group" name="group"
                           value={newServiceUser.group}
                           onChange={(e) => setNewServiceUser({...newServiceUser, group: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none bg-white"
                         >
                           <option value="">Select a group...</option>
                           {availableGroups.map(group => (
@@ -531,11 +758,11 @@ I would like my carers to provide meal support on each visit. I would like these
                       </div>
 
                       {/* Section: Contact & Access */}
-                      <div className="sm:col-span-6 border-b border-gray-200 pb-2 mb-2 mt-4">
-                        <h4 className="text-lg font-medium text-gray-900">Contact & Access</h4>
+                      <div className="sm:col-span-6 border-b border-slate-100 pb-2 mb-2 mt-4">
+                        <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Contact & Access</h4>
                       </div>
                       <div className="sm:col-span-4 relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Search Address</label>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Search Address</label>
                         <input type="text"
                           value={addressSearch}
                           onChange={(e) => {
@@ -543,10 +770,10 @@ I would like my carers to provide meal support on each visit. I would like these
                             setAddressSearch(e.target.value);
                           }}
                           onBlur={() => setTimeout(() => setShowAddressSuggestions(false), 200)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none bg-slate-50"
                         />
                         {showAddressSuggestions && addressSuggestions.length > 0 && (
-                            <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md mt-1 shadow-lg max-h-60 overflow-y-auto">
+                            <div className="absolute z-10 w-full bg-white border border-slate-200 rounded-xl mt-1 shadow-lg max-h-60 overflow-y-auto">
                                 <ul>
                                     {addressSuggestions.map((address) => (
                                         <li 
@@ -563,232 +790,232 @@ I would like my carers to provide meal support on each visit. I would like these
                       </div>
 
                       <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700">House Name / Number</label>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">House Name / Number</label>
                         <input type="text"
                           value={addressParts.houseNumber}
                           onChange={(e) => handleAddressPartChange('houseNumber', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-4">
-                        <label className="block text-sm font-medium text-gray-700">Street</label>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Street</label>
                         <input type="text"
                           value={addressParts.street}
                           onChange={(e) => handleAddressPartChange('street', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700">Town / City</label>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Town / City</label>
                         <input type="text"
                           value={addressParts.town}
                           onChange={(e) => handleAddressPartChange('town', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700">County</label>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">County</label>
                         <input type="text"
                           value={addressParts.county}
                           onChange={(e) => handleAddressPartChange('county', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700">Postcode</label>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Postcode</label>
                         <input type="text"
                           value={addressParts.postcode}
                           onChange={(e) => handleAddressPartChange('postcode', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
 
                       <div className="sm:col-span-2">
-                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone</label>
+                        <label htmlFor="phone" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Phone</label>
                         <input type="text" name="phone" id="phone"
                           value={newServiceUser.phone}
                           onChange={(e) => setNewServiceUser({...newServiceUser, phone: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                        <label htmlFor="email" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Email</label>
                         <input type="email" name="email" id="email"
                           value={newServiceUser.email}
                           onChange={(e) => setNewServiceUser({...newServiceUser, email: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="keySafeCode" className="block text-sm font-medium text-gray-700">Key Safe Code</label>
+                        <label htmlFor="keySafeCode" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Key Safe Code</label>
                         <input type="text" name="keySafeCode" id="keySafeCode"
                           value={newServiceUser.keySafeCode}
                           onChange={(e) => setNewServiceUser({...newServiceUser, keySafeCode: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="accessInstructions" className="block text-sm font-medium text-gray-700">Access Instructions</label>
+                        <label htmlFor="accessInstructions" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Access Instructions</label>
                         <input type="text" name="accessInstructions" id="accessInstructions"
                           value={newServiceUser.accessInstructions}
                           onChange={(e) => setNewServiceUser({...newServiceUser, accessInstructions: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
 
                       {/* Section: Care Circle & Legal */}
-                      <div className="sm:col-span-6 border-b border-gray-200 pb-2 mb-2 mt-4">
-                        <h4 className="text-lg font-medium text-gray-900">Care Circle & Legal</h4>
+                      <div className="sm:col-span-6 border-b border-slate-100 pb-2 mb-2 mt-4">
+                        <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Care Circle & Legal</h4>
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="emergencyContact" className="block text-sm font-medium text-gray-700">Emergency Contact</label>
+                        <label htmlFor="emergencyContact" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Emergency Contact</label>
                         <input type="text" name="emergencyContact" id="emergencyContact"
                           value={newServiceUser.emergencyContact}
                           onChange={(e) => setNewServiceUser({...newServiceUser, emergencyContact: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="powerOfAttorney" className="block text-sm font-medium text-gray-700">Power of Attorney</label>
+                        <label htmlFor="powerOfAttorney" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Power of Attorney</label>
                         <input type="text" name="powerOfAttorney" id="powerOfAttorney"
                           value={newServiceUser.powerOfAttorney}
                           onChange={(e) => setNewServiceUser({...newServiceUser, powerOfAttorney: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
-                        <label htmlFor="gpName" className="block text-sm font-medium text-gray-700">GP Name</label>
+                        <label htmlFor="gpName" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">GP Name</label>
                         <input type="text" name="gpName" id="gpName"
                           value={newServiceUser.gpName}
                           onChange={(e) => setNewServiceUser({...newServiceUser, gpName: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
-                        <label htmlFor="gpContact" className="block text-sm font-medium text-gray-700">GP Contact</label>
+                        <label htmlFor="gpContact" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">GP Contact</label>
                         <input type="text" name="gpContact" id="gpContact"
                           value={newServiceUser.gpContact}
                           onChange={(e) => setNewServiceUser({...newServiceUser, gpContact: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
-                        <label htmlFor="dnacpr" className="block text-sm font-medium text-gray-700">DNACPR Status</label>
+                        <label htmlFor="dnacpr" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">DNACPR Status</label>
                         <select id="dnacpr" name="dnacpr"
                           value={newServiceUser.dnacpr}
                           onChange={(e) => setNewServiceUser({...newServiceUser, dnacpr: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none bg-white"
                         >
                           <option value="">Unknown</option>
                           <option value="Yes - On file">Yes - On file</option>
                           <option value="No">No</option>
                         </select>
                       </div>
-                      <div className="sm:col-span-3">
-                        <label htmlFor="pharmacyName" className="block text-sm font-medium text-gray-700">Pharmacy Name</label>
+                      <div className="sm:col-span-3"> 
+                        <label htmlFor="pharmacyName" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Pharmacy Name</label>
                         <input type="text" name="pharmacyName" id="pharmacyName"
                           value={newServiceUser.pharmacyName}
                           onChange={(e) => setNewServiceUser({...newServiceUser, pharmacyName: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="pharmacyContact" className="block text-sm font-medium text-gray-700">Pharmacy Contact</label>
+                        <label htmlFor="pharmacyContact" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Pharmacy Contact</label>
                         <input type="text" name="pharmacyContact" id="pharmacyContact"
                           value={newServiceUser.pharmacyContact}
                           onChange={(e) => setNewServiceUser({...newServiceUser, pharmacyContact: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
 
                       {/* Section: Medical & Care Needs */}
-                      <div className="sm:col-span-6 border-b border-gray-200 pb-2 mb-2 mt-4">
-                        <h4 className="text-lg font-medium text-gray-900">Medical & Care Needs</h4>
+                      <div className="sm:col-span-6 border-b border-slate-100 pb-2 mb-2 mt-4">
+                        <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Medical & Care Needs</h4>
                       </div>
                       <div className="sm:col-span-6">
-                        <label htmlFor="condition" className="block text-sm font-medium text-gray-700">Primary Condition</label>
+                        <label htmlFor="condition" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Primary Condition</label>
                         <input type="text" name="condition" id="condition" required
                           value={newServiceUser.condition}
                           onChange={(e) => setNewServiceUser({...newServiceUser, condition: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" 
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none" 
                         />
                       </div>
                       <div className="sm:col-span-6">
-                        <label htmlFor="medicalHistory" className="block text-sm font-medium text-gray-700">Medical History</label>
+                        <label htmlFor="medicalHistory" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Medical History</label>
                         <textarea rows={2} name="medicalHistory" id="medicalHistory"
                           value={newServiceUser.medicalHistory}
                           onChange={(e) => setNewServiceUser({...newServiceUser, medicalHistory: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-6">
-                        <label htmlFor="riskAssessment" className="block text-sm font-medium text-gray-700">Risk Assessment Notes</label>
+                        <label htmlFor="riskAssessment" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Risk Assessment Notes</label>
                         <textarea rows={2} name="riskAssessment" id="riskAssessment"
                           value={newServiceUser.riskAssessment}
                           onChange={(e) => setNewServiceUser({...newServiceUser, riskAssessment: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-6">
-                        <label htmlFor="mobilityNeeds" className="block text-sm font-medium text-gray-700">Mobility Needs</label>
+                        <label htmlFor="mobilityNeeds" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Mobility Needs</label>
                         <input type="text" name="mobilityNeeds" id="mobilityNeeds"
                           value={newServiceUser.mobilityNeeds}
                           onChange={(e) => setNewServiceUser({...newServiceUser, mobilityNeeds: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-6">
-                        <label htmlFor="nutritionNeeds" className="block text-sm font-medium text-gray-700">Nutrition & Hydration Needs</label>
+                        <label htmlFor="nutritionNeeds" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Nutrition & Hydration Needs</label>
                         <input type="text" name="nutritionNeeds" id="nutritionNeeds"
                           value={newServiceUser.nutritionNeeds}
                           onChange={(e) => setNewServiceUser({...newServiceUser, nutritionNeeds: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-6">
-                        <label htmlFor="personalCareNeeds" className="block text-sm font-medium text-gray-700">Personal Care Needs</label>
+                        <label htmlFor="personalCareNeeds" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Personal Care Needs</label>
                         <input type="text" name="personalCareNeeds" id="personalCareNeeds"
                           value={newServiceUser.personalCareNeeds}
                           onChange={(e) => setNewServiceUser({...newServiceUser, personalCareNeeds: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
                         />
                       </div>
 
                       {/* Section: Person-Centered Care */}
-                      <div className="sm:col-span-6 border-b border-gray-200 pb-2 mb-2 mt-4">
-                        <h4 className="text-lg font-medium text-gray-900">Person-Centered Care</h4>
+                      <div className="sm:col-span-6 border-b border-slate-100 pb-2 mb-2 mt-4">
+                        <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Person-Centered Care</h4>
                       </div>
                       <div className="sm:col-span-6">
-                        <label htmlFor="lifeHistory" className="block text-sm font-medium text-gray-700">Life History / Bio</label>
+                        <label htmlFor="lifeHistory" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Life History / Bio</label>
                         <textarea rows={3} name="lifeHistory" id="lifeHistory"
                           value={newServiceUser.lifeHistory}
                           onChange={(e) => setNewServiceUser({...newServiceUser, lifeHistory: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" placeholder="Previous occupation, family details..."
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 outline-none" placeholder="Previous occupation, family details..."
                         />
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="likes" className="block text-sm font-medium text-gray-700">Likes & Preferences</label>
+                        <label htmlFor="likes" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Likes & Preferences</label>
                         <textarea rows={2} name="likes" id="likes"
                           value={newServiceUser.likes}
                           onChange={(e) => setNewServiceUser({...newServiceUser, likes: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
-                        <label htmlFor="dislikes" className="block text-sm font-medium text-gray-700">Dislikes & Fears</label>
+                        <label htmlFor="dislikes" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Dislikes & Fears</label>
                         <textarea rows={2} name="dislikes" id="dislikes"
                           value={newServiceUser.dislikes}
                           onChange={(e) => setNewServiceUser({...newServiceUser, dislikes: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 outline-none"
                         />
                       </div>
 
                       {/* Section: Groups */}
-                      <div className="sm:col-span-6 border-b border-gray-200 pb-2 mb-2 mt-4">
-                        <h4 className="text-lg font-medium text-gray-900">Groups & Rota Allocation</h4>
+                      <div className="sm:col-span-6 border-b border-slate-100 pb-2 mb-2 mt-4">
+                        <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Groups & Rota Allocation</h4>
                       </div>
                       <div className="sm:col-span-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Select groups for this user:</label>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Select groups for this user:</label>
                         <div className="flex flex-wrap gap-2 mb-3">
                           {availableGroups.map(group => (
                             <button
@@ -808,50 +1035,73 @@ I would like my carers to provide meal support on each visit. I would like these
                                   : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
                               }`}
                             >
-                              {group} {newServiceUser.groups?.includes(group) && '✓'}
+                              {group} {newServiceUser.groups?.includes(group) && 'â'}
                             </button>
                           ))}
                         </div>
                       </div>
                     </div>
                     <div className="flex justify-end">
-                      <button type="submit" className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                      <button type="submit" className="ml-3 inline-flex justify-center rounded-xl border border-transparent bg-blue-600 py-3 px-6 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-blue-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all active:scale-95">
                         Save Service User
                       </button>
                     </div>
                   </form>
                 </div>
               )}
-
-              <div className="bg-white shadow overflow-hidden sm:rounded-md">
-                <ul role="list" className="divide-y divide-gray-200">
-                  {serviceUsers.filter(user => pocTypeFilter === 'All' || user.pocType === pocTypeFilter).map((serviceUser) => (
-                    <li key={serviceUser.id} onClick={() => { setSelectedServiceUser(serviceUser); setIsEditing(false); }} className="block hover:bg-gray-50 cursor-pointer transition duration-150 ease-in-out">
-                      <div className="px-4 py-4 sm:px-6">
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm font-medium text-blue-600 truncate">
-                            {serviceUser.name}
+              
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {serviceUsers.filter(user => pocTypeFilter === 'All' || user.pocType === pocTypeFilter).map((serviceUser) => (
+                  <div 
+                      key={serviceUser.id} 
+                      onClick={() => { setSelectedServiceUser(serviceUser); setIsEditing(false); }}
+                      className="group relative flex flex-col bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md cursor-pointer overflow-hidden"
+                      style={{ borderTop: `6px solid ${getPocColor(serviceUser.pocType)}` }}
+                  >
+                      {/* Card Content */}
+                      <div className="p-6 flex-1">
+                          <div className="flex items-start justify-between mb-4">
+                              <div className="relative">
+                                  {serviceUser.profileImage ? (
+                                      <img src={serviceUser.profileImage} alt="" className="w-16 h-16 rounded-2xl object-cover shadow-sm" />
+                                  ) : (
+                                      <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                                          <User size={32} />
+                                      </div>
+                                  )}
+                                  <span className={`absolute -bottom-1 -right-1 w-4 h-4 border-2 border-white rounded-full ${serviceUser.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
+                              </div>
+                              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide border ${serviceUser.status === 'Active' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' : 'bg-slate-50 text-slate-500 border-slate-100'}`}>
+                                  {serviceUser.status}
+                              </span>
                           </div>
-                          <div className="ml-2 flex-shrink-0 flex">
-                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${serviceUser.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                              {serviceUser.status}
-                            </span>
+                          
+                          <h3 className="text-lg font-black text-slate-900 dark:text-white mb-1 leading-tight group-hover:text-blue-600 transition-colors">
+                              {serviceUser.firstName} {serviceUser.lastName}
+                          </h3>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">#{serviceUser.clientCode || serviceUser.id}</p>
+                          <p className="text-sm font-medium text-slate-500 mb-4">{serviceUser.area || 'Area Not Assigned'}</p>
+                          
+                          <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 p-2 rounded-lg">
+                                  <span className="text-slate-400 uppercase text-[9px] tracking-wider w-16">DOB</span>
+                                  <span>{serviceUser.dob}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 p-2 rounded-lg">
+                                  <span className="text-slate-400 uppercase text-[9px] tracking-wider w-16">Cond.</span>
+                                  <span className="truncate">{serviceUser.condition || 'N/A'}</span>
+                              </div>
                           </div>
-                        </div>
-                        <div className="mt-2 sm:flex sm:justify-between">
-                          <div className="sm:flex">
-                            <p className="flex items-center text-sm text-gray-500">
-                              DOB: {serviceUser.dob}
-                            </p>
-                            <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                              Condition: {serviceUser.condition}
-                            </p>
-                          </div>
-                        </div>
                       </div>
-                    </li>
-                  ))}
-                </ul>
+                      
+                      <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{serviceUser.pocType || 'Standard'}</span>
+                          <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:text-white transition-all">
+                              <ChevronRight size={16} />
+                          </div>
+                      </div>
+                  </div>
+                ))}
               </div>
 
             </div>

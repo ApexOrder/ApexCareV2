@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
 
 // Custom Hook for Visit Logic
 const useVisits = (initialVisits, onUpdateClient, client) => {
@@ -343,11 +344,11 @@ const ClientVisitsView = ({ client, onUpdateClient, userRole, staff = [] }) => {
             {/* Calendar Header */}
             <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                 <div className="flex items-center gap-4">
-                    <button onClick={handlePrevMonth} className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors">←</button>
+                    <button onClick={handlePrevMonth} className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors"><ArrowLeft size={20} /></button>
                     <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
                         {currentMonth.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
                     </h3>
-                    <button onClick={handleNextMonth} className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors">→</button>
+                    <button onClick={handleNextMonth} className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors"><ArrowRight size={20} /></button>
                 </div>
                 <div className="flex gap-2 flex-wrap justify-center">
                     <button onClick={() => setVisitPeriodFilter('All')} className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors ${visitPeriodFilter === 'All' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}>All</button>
@@ -487,7 +488,7 @@ const ClientVisitsView = ({ client, onUpdateClient, userRole, staff = [] }) => {
                                         className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg font-light opacity-0 group-hover:opacity-100 transition-opacity hover:bg-blue-600"
                                         title="Add Visit"
                                     >
-                                        +
+                                        <Plus size={14} />
                                     </button>
                                 )}
                             </div>
@@ -589,7 +590,7 @@ const ClientVisitsView = ({ client, onUpdateClient, userRole, staff = [] }) => {
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pay Rate (£/hr)</label>
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pay Rate (Â£/hr)</label>
                                                     <input 
                                                         type="number" 
                                                         value={visitForm.additionalPayRate} 

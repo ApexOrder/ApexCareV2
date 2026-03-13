@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Check, Trash2, ClipboardList } from 'lucide-react';
 
 const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
   const [taskSearch, setTaskSearch] = useState('');
@@ -224,7 +225,7 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
                             onClick={() => handleToggleTask(task.id)}
                             className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors ${task.isCompleted ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 hover:border-blue-500'}`}
                           >
-                            {task.isCompleted && '✓'}
+                            {task.isCompleted && <Check size={14} />}
                           </button>
                           <span className={`flex-1 font-bold ${task.isCompleted ? 'text-emerald-700 line-through' : 'text-slate-700'}`}>
                               {!['Morning', 'Afternoon', 'Evening', 'Anytime'].includes(task.timeOfDay) && (
@@ -247,7 +248,7 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
                             onClick={() => handleDeleteTask(task.id)}
                             className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-all"
                           >
-                            🗑️
+                            <Trash2 size={16} />
                           </button>
                           )}
                        </div>
@@ -258,7 +259,7 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
          })}
          {tasks.length === 0 && (
             <div className="col-span-full py-20 flex flex-col items-center justify-center bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
-               <span className="text-4xl mb-4 opacity-30">✅</span>
+               <ClipboardList size={48} className="mb-4 text-slate-300" />
                <p className="text-sm font-black text-slate-400 uppercase tracking-widest">No tasks scheduled</p>
             </div>
          )}

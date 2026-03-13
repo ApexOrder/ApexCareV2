@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Users, Calendar, CreditCard, BarChart3, Pill, Layers, Plus } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 
 const initialModules = [
   { 
@@ -9,7 +11,10 @@ const initialModules = [
     href: '/patient-management',
     exports: ['ServiceUserID', 'Demographics', 'Group'],
     imports: [],
-    color: '#3b82f6'
+    color: '#3b82f6',
+    icon: Users,
+    bg: 'bg-blue-50',
+    iconColor: 'text-blue-600'
   },
   { 
     id: 2, 
@@ -18,7 +23,10 @@ const initialModules = [
     href: '#',
     exports: ['AppointmentID', 'VisitLogs'],
     imports: ['ServiceUserID'],
-    color: '#10b981'
+    color: '#10b981',
+    icon: Calendar,
+    bg: 'bg-emerald-50',
+    iconColor: 'text-emerald-600'
   },
   { 
     id: 3, 
@@ -27,7 +35,10 @@ const initialModules = [
     href: '#',
     exports: ['InvoiceID'],
     imports: ['ServiceUserID', 'AppointmentID'],
-    color: '#8b5cf6'
+    color: '#8b5cf6',
+    icon: CreditCard,
+    bg: 'bg-violet-50',
+    iconColor: 'text-violet-600'
   },
   { 
     id: 4, 
@@ -36,7 +47,10 @@ const initialModules = [
     href: '#',
     exports: [],
     imports: ['Demographics', 'VisitLogs', 'InvoiceID'],
-    color: '#f59e0b'
+    color: '#f59e0b',
+    icon: BarChart3,
+    bg: 'bg-amber-50',
+    iconColor: 'text-amber-600'
   },
   { 
     id: 5, 
@@ -45,7 +59,10 @@ const initialModules = [
     href: '/medication-tracker',
     exports: ['MedicationList'],
     imports: ['ServiceUserID'],
-    color: '#14b8a6'
+    color: '#14b8a6',
+    icon: Pill,
+    bg: 'bg-teal-50',
+    iconColor: 'text-teal-600'
   },
   { 
     id: 6, 
@@ -54,7 +71,10 @@ const initialModules = [
     href: '/group-management',
     exports: ['GroupList'],
     imports: ['ServiceUserID', 'StaffID'],
-    color: '#6366f1'
+    color: '#6366f1',
+    icon: Layers,
+    bg: 'bg-indigo-50',
+    iconColor: 'text-indigo-600'
   },
 ];
 
@@ -106,7 +126,7 @@ export default function AdminDashboard() {
     const newId = modules.length + 1;
     setModules([
       ...modules,
-      { id: newId, name: `New Module ${newId}`, description: 'A newly added custom module.', href: '#', exports: [], imports: [], color: '#71717a' }
+      { id: newId, name: `New Module ${newId}`, description: 'A newly added custom module.', href: '#', exports: [], imports: [], color: '#71717a', icon: Layers, bg: 'bg-zinc-50', iconColor: 'text-zinc-600' }
     ]);
   };
 
@@ -148,16 +168,17 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <nav className="bg-white border-b border-slate-200 shadow-sm">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
         <div className="mx-auto max-w-[100rem] px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-between">
             <div className="flex">
               <div className="flex flex-shrink-0 items-center">
-                <h1 className="text-xl font-black text-slate-900">ApexCare V2 <span className="text-blue-600">Master</span></h1>
+                <h1 className="text-xl font-black text-slate-900 dark:text-white">ApexCare V2 <span className="text-blue-600">Master</span></h1>
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              <ThemeToggle />
               <Link href="/login" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900">
                 Sign out
               </Link>
@@ -169,23 +190,23 @@ export default function AdminDashboard() {
       <div className="py-10">
         <header>
           <div className="mx-auto max-w-[100rem] px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h1 className="text-3xl font-black leading-tight tracking-tight text-slate-900">Module Management</h1>
+            <h1 className="text-3xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">Module Management</h1>
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsEditing(!isEditing)}
                 className={`rounded-xl px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 ${
                   isEditing
                     ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200 hover:bg-emerald-700'
-                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                    : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
                 }`}
               >
                 {isEditing ? 'Done Editing' : 'Edit Layout'}
               </button>
               <button
                 onClick={handleAddModule}
-                className="rounded-xl bg-blue-600 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95"
+                className="rounded-xl bg-blue-600 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2 group"
               >
-                Add New Module
+                <Plus size={14} className="transition-transform duration-300 group-hover:rotate-90" /> Add New Module
               </button>
             </div>
           </div>
@@ -202,13 +223,18 @@ export default function AdminDashboard() {
                     onDragOver={isEditing ? handleDragOver : undefined}
                     onDrop={isEditing ? (e) => handleDrop(e, module.id) : undefined}
                     onDragEnd={isEditing ? handleDragEnd : undefined}
-                    className={`relative overflow-hidden rounded-[2.5rem] bg-white border border-slate-200 shadow-sm hover:shadow-lg transition-all ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'} ${draggedModuleId === module.id ? 'opacity-50 ring-2 ring-blue-500' : ''}`}
+                    className={`relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-lg transition-all ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'} ${draggedModuleId === module.id ? 'opacity-50 ring-2 ring-blue-500' : ''} group`}
                     style={{ borderTop: `6px solid ${module.color}` }}
                   >
                     <div className="px-8 py-8 h-full flex flex-col justify-between">
                       <div>
                         <div className="flex justify-between items-start">
-                          <h3 className="text-xl font-black text-slate-900 pr-10">{module.name}</h3>
+                          <div className="flex items-center gap-4">
+                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${module.bg || 'bg-slate-50 dark:bg-slate-800'} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6`}>
+                                {module.icon && <module.icon size={20} className={module.iconColor || 'text-slate-600'} />}
+                             </div>
+                             <h3 className="text-xl font-black text-slate-900 dark:text-white">{module.name}</h3>
+                          </div>
                           {isEditing && (
                             <input type="color" value={module.color} 
                               onChange={(e) => handleColorChange(module.id, e.target.value)} 

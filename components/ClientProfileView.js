@@ -1,8 +1,23 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { 
+  LayoutDashboard, 
+  User, 
+  ClipboardList, 
+  CalendarDays, 
+  FileText, 
+  Clock, 
+  Scan, 
+  Download, 
+  ArrowLeft, 
+  Car, 
+  Pill, 
+  File
+} from 'lucide-react';
 import TaskManagement from './TaskManagement';
 import ClientVisitsView from './ClientVisitsView';
 // import ClientLogsView from './ClientLogsView';
 import ClientInformationView from './ClientInformationView';
+import ThemeToggle from './ThemeToggle';
 // import ClientRiskView from './ClientRiskView';
 
 const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyStateChange, userRole, staff = [], availableGroups = [] }) => {
@@ -278,19 +293,19 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
   };
 
   const managementMenu = [
-    { id: 'Overview', icon: '🏠' },
-    { id: 'Client Information', icon: '👤' },
-    { id: 'Tasks', icon: '✅' },
-    { id: 'Visits', icon: '📅' },
-    { id: 'Documents', icon: '📂' },
-    { id: 'Timeline', icon: '⏳' },
+    { id: 'Overview', icon: LayoutDashboard, color: 'text-blue-500' },
+    { id: 'Client Information', icon: User, color: 'text-violet-500' },
+    { id: 'Tasks', icon: ClipboardList, color: 'text-emerald-500' },
+    { id: 'Visits', icon: CalendarDays, color: 'text-amber-500' },
+    { id: 'Documents', icon: FileText, color: 'text-rose-500' },
+    { id: 'Timeline', icon: Clock, color: 'text-indigo-500' },
   ];
 
   return (
     <div className="flex flex-col lg:flex-row h-auto lg:h-screen bg-slate-50 overflow-y-auto lg:overflow-hidden">
       {/* MANAGEMENT SUB-NAVBAR */}
-      <div className="w-full lg:w-24 group hover:lg:w-72 bg-white border-r border-l border-slate-200 flex flex-col h-auto lg:h-full shadow-2xl z-[110] shrink-0 transition-all duration-300 ease-in-out">
-        <div className="p-4 lg:group-hover:p-6 md:lg:group-hover:p-8 border-b border-slate-200 flex flex-col items-center transition-all">
+      <div className="w-full lg:w-24 group hover:lg:w-72 bg-white dark:bg-slate-900 border-r border-l border-slate-200 dark:border-slate-800 flex flex-col h-auto lg:h-full shadow-2xl z-[110] shrink-0 transition-all duration-300 ease-in-out">
+        <div className="p-4 lg:group-hover:p-6 md:lg:group-hover:p-8 border-b border-slate-200 dark:border-slate-800 flex flex-col items-center transition-all">
           <div className="relative mb-4 cursor-pointer" onClick={() => userRole === 'admin' && fileInputRef.current?.click()}>
              <img src={client.profileImage || `https://picsum.photos/seed/${client.id}/120/120`} className="w-16 h-16 lg:group-hover:w-20 lg:group-hover:h-20 rounded-[1.5rem] lg:group-hover:rounded-[2rem] object-cover shadow-2xl border-4 border-white transition-all" alt="" />
              {userRole === 'admin' && (
@@ -302,12 +317,12 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
              <input type="file" ref={fileInputRef} className="hidden" accept="image/jpeg, image/png" onChange={handleProfileImageUpdate} />
           </div>
           <div className="flex flex-col items-center overflow-hidden transition-all duration-300 ease-in-out lg:max-h-0 lg:opacity-0 lg:group-hover:max-h-24 lg:group-hover:opacity-100">
-             <h2 className="text-xl font-black text-slate-900 text-center leading-none mb-1 whitespace-nowrap">{client.firstName} {client.lastName}</h2>
-             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{client.id}</p>
+             <h2 className="text-xl font-black text-slate-900 dark:text-white text-center leading-none mb-1 whitespace-nowrap">{client.firstName} {client.lastName}</h2>
+             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">#{client.clientCode || client.id}</p>
           </div>
-          <button onClick={onBack} className="mt-6 w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl transition-all relative overflow-hidden">
+          <button onClick={onBack} className="mt-6 w-full py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-xl transition-all relative overflow-hidden">
             <div className="absolute inset-0 flex items-center justify-center transition-all duration-300 opacity-100 lg:group-hover:opacity-0 lg:group-hover:scale-75">
-                <span className="text-xl">←</span>
+                <ArrowLeft size={20} />
             </div>
             <div className="w-full flex items-center justify-center transition-all duration-300 opacity-0 lg:group-hover:opacity-100">
                  <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Exit to Dashboard</span>
@@ -320,16 +335,20 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
             <button
               key={item.id}
               onClick={() => setActiveSubTab(item.id)}
-              className={`w-auto lg:w-full flex items-center lg:justify-center lg:group-hover:justify-start gap-2 lg:gap-0 lg:group-hover:gap-4 px-4 lg:group-hover:px-5 py-2 lg:py-3 text-sm font-bold rounded-2xl transition-all whitespace-nowrap ${
+              className={`group/btn w-auto lg:w-full flex items-center lg:justify-center lg:group-hover:justify-start gap-2 lg:gap-0 lg:group-hover:gap-4 px-4 lg:group-hover:px-5 py-2 lg:py-3 text-sm font-bold rounded-2xl transition-all whitespace-nowrap ${
                 activeSubTab === item.id 
                   ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' 
-                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
-              <span className="text-xl shrink-0">{item.icon}</span>
+              <span className={`shrink-0 transition-transform duration-300 group-hover/btn:scale-110 group-hover/btn:rotate-6 ${activeSubTab === item.id ? 'text-white' : item.color}`}><item.icon size={20} /></span>
               <span className="truncate lg:hidden lg:group-hover:inline">{item.id}</span>
             </button>
           ))}
+          
+          <div className="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 w-full">
+             <ThemeToggle className="w-full" />
+          </div>
         </nav>
       </div>
 
@@ -343,7 +362,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                   onClick={() => setShowQrModal(true)}
                   className="w-full md:w-auto px-4 py-2 bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-slate-50 transition-colors shadow-sm flex items-center justify-center gap-2"
               >
-                  <span className="text-base">📱</span> QR Access
+                  <Scan size={16} /> QR Access
               </button>
               {userRole === 'admin' && (client.status === 'Active' ? (
                  <button 
@@ -370,7 +389,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                     </button>
                  </div>
               ))}
-              <button className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg shadow-blue-200 transition-transform active:scale-95"><span className="mr-2">📂</span>Export Evidence Pack</button>
+              <button className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg shadow-blue-200 transition-transform active:scale-95 flex items-center"><Download size={16} className="mr-2" />Export Evidence Pack</button>
            </div>
         </div>
 
@@ -382,8 +401,8 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {/* Next Visit with Scheduled Carer */}
                   <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl relative overflow-hidden group" style={{ borderTop: '6px solid #3b82f6' }}>
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                      <span className="text-4xl">🚐</span>
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-all duration-500 group-hover:scale-110 group-hover:-rotate-12 group-hover:-translate-x-2">
+                      <Car size={48} className="text-blue-600" />
                     </div>
                     <p className="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Next Scheduled Visit</p>
                     <p className="text-2xl font-black text-slate-900">09:00 - 10:00</p>
@@ -440,7 +459,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden" style={{ borderTop: '6px solid #3b82f6' }}>
                   <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                      <h3 className="text-2xl font-black text-slate-900 tracking-tight">Identity & Profile Summary</h3>
-                     <button onClick={() => setActiveSubTab('Client Information')} className="text-[10px] font-black text-blue-600 uppercase hover:underline">Full Details →</button>
+                     <button onClick={() => setActiveSubTab('Client Information')} className="text-[10px] font-black text-blue-600 uppercase hover:underline">Full Details â</button>
                   </div>
                   <div className="p-10 grid grid-cols-2 lg:grid-cols-4 gap-8">
                      {[
@@ -572,13 +591,13 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                     {documents.length > 0 ? documents.map(doc => (
                        <div key={doc.id} className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:shadow-md transition-all group relative cursor-pointer">
                           <div className="flex justify-between items-start mb-4">
-                             <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-2xl">{doc.type === 'PDF' ? '📄' : '📁'}</div>
+                             <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-blue-600">{doc.type === 'PDF' ? <FileText size={24} /> : <File size={24} />}</div>
                           </div>
                           <h4 className="font-bold text-slate-900 truncate mb-1" title={doc.name}>{doc.name}</h4>
                        </div>
                     )) : (
                        <div className="col-span-full py-20 flex flex-col items-center justify-center bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
-                          <span className="text-4xl mb-4 opacity-30">📂</span>
+                          <FileText size={48} className="mb-4 text-slate-300" />
                           <p className="text-sm font-black text-slate-400 uppercase tracking-widest">No documents uploaded</p>
                        </div>
                     )}
@@ -607,7 +626,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                                </div>
                                <ul className="space-y-1">
                                  {entry.changes.map((change, idx) => (
-                                   <li key={idx} className="text-sm text-slate-600 font-medium">• {change}</li>
+                                   <li key={idx} className="text-sm text-slate-600 font-medium">â¢ {change}</li>
                                  ))}
                                </ul>
                             </div>
@@ -624,7 +643,10 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
 
            {activeSubTab !== 'Overview' && activeSubTab !== 'Client Information' && activeSubTab !== 'Timeline' && activeSubTab !== 'Documents' && activeSubTab !== 'Tasks' && activeSubTab !== 'Visits' && (
              <div className="py-40 flex flex-col items-center justify-center bg-white rounded-[3rem] border border-dashed border-slate-200 opacity-30">
-                <span className="text-6xl mb-6">{managementMenu.find(m => m.id === activeSubTab)?.icon || '⚙️'}</span>
+                {(() => {
+                    const Icon = managementMenu.find(m => m.id === activeSubTab)?.icon || FileText;
+                    return <Icon size={64} className="mb-6" />;
+                })()}
                 <p className="text-xl font-black uppercase tracking-widest text-slate-500">{activeSubTab} Deployment Pending</p>
              </div>
            )}
@@ -724,7 +746,7 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
                 <div className="absolute top-0 left-0 right-0 h-32 bg-emerald-600"></div>
                 <div className="relative z-10">
                     <div className="w-20 h-20 bg-white rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-xl text-4xl">
-                        💊
+                        <Pill size={40} className="text-emerald-600" />
                     </div>
                     <h3 className="text-2xl font-black text-slate-900 text-center mb-2">Reorder Medication</h3>
                     <p className="text-xs font-bold text-slate-500 text-center uppercase tracking-widest mb-8">Prescription Request Details</p>

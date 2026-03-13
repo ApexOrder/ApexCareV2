@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { User, Globe, ClipboardCheck, Phone, Plus, X, MapPin } from 'lucide-react';
 
 const ClientInformationView = ({ client, onUpdateClient, userRole, availableGroups, onDirtyStateChange }) => {
     // Editing States
@@ -375,7 +376,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
     const identityGroups = [
         {
             title: 'Personal Details',
-            icon: '👤',
+            icon: User,
             color: 'text-blue-600',
             bg: 'bg-blue-50/50',
             border: 'border-blue-100',
@@ -392,7 +393,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
         },
         {
             title: 'Cultural Context',
-            icon: '🌍',
+            icon: Globe,
             color: 'text-amber-600',
             bg: 'bg-amber-50/50',
             border: 'border-amber-100',
@@ -406,7 +407,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
         },
         {
             title: 'Service & Governance',
-            icon: '📋',
+            icon: ClipboardCheck,
             color: 'text-purple-600',
             bg: 'bg-purple-50/50',
             border: 'border-purple-100',
@@ -443,7 +444,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                     {identityGroups.slice(0, 1).map((group) => (
                         <div key={group.title} className={`rounded-3xl p-6 border ${group.border} ${group.bg} space-y-6`}>
                             <div className="flex items-center gap-3 mb-2">
-                                <span className="text-2xl">{group.icon}</span>
+                                <span className={`text-2xl ${group.color}`}><group.icon size={24} /></span>
                                 <h4 className={`text-lg font-black uppercase tracking-tight ${group.color}`}>{group.title}</h4>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -465,7 +466,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                                 />
                                             )
                                         ) : (
-                                            <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">{(item.getValue ? item.getValue(client) : client[item.key]) || '—'}</p>
+                                            <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">{(item.getValue ? item.getValue(client) : client[item.key]) || 'â'}</p>
                                         )}
                                     </div>
                                 ))}
@@ -476,7 +477,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                     {/* Custom Contact Information Card - Moved here */}
                     <div className="rounded-3xl p-6 border border-emerald-100 bg-emerald-50/50 space-y-6">
                         <div className="flex items-center gap-3 mb-2">
-                            <span className="text-2xl">📞</span>
+                            <span className="text-emerald-600"><Phone size={24} /></span>
                             <h4 className="text-lg font-black uppercase tracking-tight text-emerald-600">Contact Information</h4>
                         </div>
                         <div className="space-y-6">
@@ -487,7 +488,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                     {isEditingIdentity ? (
                                         <input type="text" value={editContacts.phone} onChange={(e) => setEditContacts({...editContacts, phone: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs font-bold text-slate-900 p-2.5" />
                                     ) : (
-                                        <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">{client.phone || '—'}</p>
+                                        <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">{client.phone || 'â'}</p>
                                     )}
                                 </div>
                                 <div>
@@ -495,7 +496,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                     {isEditingIdentity ? (
                                         <input type="email" value={editContacts.email} onChange={(e) => setEditContacts({...editContacts, email: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs font-bold text-slate-900 p-2.5" />
                                     ) : (
-                                        <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">{client.email || '—'}</p>
+                                        <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">{client.email || 'â'}</p>
                                     )}
                                 </div>
                             </div>
@@ -507,14 +508,14 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                 <div className="flex justify-between items-center mb-3">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Next of Kin / Contacts</label>
                                     {isEditingIdentity && (
-                                        <button onClick={handleAddContact} className="text-[10px] font-bold text-emerald-600 bg-white border border-emerald-200 px-2 py-1 rounded-lg hover:bg-emerald-50 transition-colors">+ Add</button>
+                                        <button onClick={handleAddContact} className="text-[10px] font-bold text-emerald-600 bg-white border border-emerald-200 px-2 py-1 rounded-lg hover:bg-emerald-50 transition-colors flex items-center"><Plus size={12} className="mr-1" /> Add</button>
                                     )}
                                 </div>
                                 <div className="space-y-4">
-                                    {(isEditingIdentity ? editContacts.contacts : (client.contacts && client.contacts.length > 0 ? client.contacts : [{ name: client.nextOfKin || '—', relation: client.nextOfKinRelation || '', phone: '', address: '' }])).map((contact, idx) => (
+                                    {(isEditingIdentity ? editContacts.contacts : (client.contacts && client.contacts.length > 0 ? client.contacts : [{ name: client.nextOfKin || 'â', relation: client.nextOfKinRelation || '', phone: '', address: '' }])).map((contact, idx) => (
                                         <div key={idx} className="bg-white/50 rounded-xl p-3 border border-emerald-100 relative group">
                                             {isEditingIdentity && idx > 0 && (
-                                                <button onClick={() => handleRemoveContact(idx)} className="absolute top-2 right-2 text-rose-400 hover:text-rose-600">✕</button>
+                                                <button onClick={() => handleRemoveContact(idx)} className="absolute top-2 right-2 text-rose-400 hover:text-rose-600"><X size={14} /></button>
                                             )}
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                 <div>
@@ -536,16 +537,16 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                                     <label className="text-[8px] font-bold text-emerald-500 uppercase">Phone Number</label>
                                                     {isEditingIdentity ? (
                                                         <input type="text" value={contact.phone} onChange={(e) => { const newContacts = [...editContacts.contacts]; newContacts[idx].phone = e.target.value; setEditContacts({...editContacts, contacts: newContacts}); }} className="w-full mt-0.5 rounded-lg border-slate-200 text-xs font-bold p-1.5" placeholder="Number" />
-                                                    ) : <p className="text-xs font-bold text-slate-900">{contact.phone || '—'}</p>}
+                                                    ) : <p className="text-xs font-bold text-slate-900">{contact.phone || 'â'}</p>}
                                                 </div>
                                                 <div>
                                                     <label className="text-[8px] font-bold text-emerald-500 uppercase">Address</label>
                                                     {isEditingIdentity ? (
                                                         <input type="text" value={contact.address} onChange={(e) => { const newContacts = [...editContacts.contacts]; newContacts[idx].address = e.target.value; setEditContacts({...editContacts, contacts: newContacts}); }} className="w-full mt-0.5 rounded-lg border-slate-200 text-xs font-bold p-1.5" placeholder="Address" />
-                                                    ) : <p className="text-xs font-bold text-slate-900 truncate">{contact.address || '—'}</p>}
+                                                    ) : <p className="text-xs font-bold text-slate-900 truncate">{contact.address || 'â'}</p>}
                                     {contact.address && !isEditingIdentity && (
                                         <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contact.address)}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase text-blue-600 hover:underline block mt-1">
-                                            Open Map ↗
+                                            Open Map â
                                         </a>
                                     )}
                                 </div>
@@ -575,11 +576,11 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                                             placeholder={field} 
                                                         />
                                                     ) : (
-                                                        <p className="text-xs font-bold text-slate-900">{client[provider.key]?.[field.toLowerCase()] || (field === 'Name' ? client[provider.key]?.name : '') || '—'}</p>
+                                                        <p className="text-xs font-bold text-slate-900">{client[provider.key]?.[field.toLowerCase()] || (field === 'Name' ? client[provider.key]?.name : '') || 'â'}</p>
                                                     )}
                                                     {field === 'Address' && !isEditingIdentity && client[provider.key]?.address && (
                                                         <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(client[provider.key]?.address)}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase text-blue-600 hover:underline block mt-1">
-                                                            Open Map ↗
+                                                            Open Map â
                                                         </a>
                                                     )}
                                                 </div>
@@ -594,7 +595,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                     {identityGroups.slice(1).map((group) => (
                         <div key={group.title} className={`rounded-3xl p-6 border ${group.border} ${group.bg} space-y-6`}>
                             <div className="flex items-center gap-3 mb-2">
-                                <span className="text-2xl">{group.icon}</span>
+                                <span className={`text-2xl ${group.color}`}><group.icon size={24} /></span>
                                 <h4 className={`text-lg font-black uppercase tracking-tight ${group.color}`}>{group.title}</h4>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -616,7 +617,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                                 />
                                             )
                                         ) : (
-                                            <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">{(item.getValue ? item.getValue(client) : client[item.key]) || '—'}</p>
+                                            <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">{(item.getValue ? item.getValue(client) : client[item.key]) || 'â'}</p>
                                         )}
                                     </div>
                                 ))}
@@ -722,7 +723,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Primary Address</label>
                                         {client.address && (
                                             <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(client.address)}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase text-blue-600 hover:underline">
-                                                Open Map ↗
+                                                Open Map â
                                             </a>
                                         )}
                                     </div>

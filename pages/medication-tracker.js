@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function MedicationTracker() {
   const [medications, setMedications] = useState([
@@ -17,16 +18,17 @@ export default function MedicationTracker() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <nav className="bg-white border-b border-slate-200 shadow-sm">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
         <div className="mx-auto max-w-[100rem] px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-between">
             <div className="flex">
               <div className="flex flex-shrink-0 items-center">
-                <Link href="/dashboard" className="text-xl font-black text-slate-900">ApexCare V2</Link>
+                <Link href="/dashboard" className="text-xl font-black text-slate-900 dark:text-white">ApexCare V2</Link>
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              <ThemeToggle />
               <Link href="/dashboard" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900">
                 Back to Dashboard
               </Link>
@@ -38,7 +40,7 @@ export default function MedicationTracker() {
       <div className="py-10">
         <header>
           <div className="mx-auto max-w-[100rem] px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h1 className="text-3xl font-black leading-tight tracking-tight text-slate-900">Medication Tracker</h1>
+            <h1 className="text-3xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">Medication Tracker</h1>
             <button
               onClick={() => setShowForm(!showForm)}
               className="rounded-xl bg-blue-600 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95"
@@ -52,8 +54,8 @@ export default function MedicationTracker() {
             <div className="px-4 py-8 sm:px-0">
               
               {showForm && (
-                <div className="mb-8 bg-white border border-slate-200 shadow-sm rounded-[2.5rem] p-8">
-                  <h3 className="text-xl font-black leading-6 text-slate-900 mb-6">Add New Medication</h3>
+                <div className="mb-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-[2.5rem] p-8">
+                  <h3 className="text-xl font-black leading-6 text-slate-900 dark:text-white mb-6">Add New Medication</h3>
                   <form onSubmit={handleAddMedication} className="space-y-4">
                     <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                       <div className="sm:col-span-3">
@@ -62,7 +64,7 @@ export default function MedicationTracker() {
                           <input type="text" name="name" id="name" required
                             value={newMed.name}
                             onChange={(e) => setNewMed({...newMed, name: e.target.value})}
-                            className="block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" 
+                            className="block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white dark:bg-slate-800" 
                           />
                         </div>
                       </div>
@@ -72,7 +74,7 @@ export default function MedicationTracker() {
                           <input type="text" name="dosage" id="dosage" required
                             value={newMed.dosage}
                             onChange={(e) => setNewMed({...newMed, dosage: e.target.value})}
-                            className="block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" 
+                            className="block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white dark:bg-slate-800" 
                           />
                         </div>
                       </div>
@@ -82,7 +84,7 @@ export default function MedicationTracker() {
                           <input type="text" name="frequency" id="frequency" required
                             value={newMed.frequency}
                             onChange={(e) => setNewMed({...newMed, frequency: e.target.value})}
-                            className="block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" 
+                            className="block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white dark:bg-slate-800" 
                           />
                         </div>
                       </div>
@@ -92,7 +94,7 @@ export default function MedicationTracker() {
                           <input type="text" name="nextDose" id="nextDose"
                             value={newMed.nextDose}
                             onChange={(e) => setNewMed({...newMed, nextDose: e.target.value})}
-                            className="block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" 
+                            className="block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white dark:bg-slate-800" 
                           />
                         </div>
                       </div>
@@ -106,15 +108,15 @@ export default function MedicationTracker() {
                 </div>
               )}
 
-              <div className="bg-white border border-slate-200 shadow-sm overflow-hidden rounded-[2.5rem]">
-                <ul role="list" className="divide-y divide-slate-100">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden rounded-[2.5rem]">
+                <ul role="list" className="divide-y divide-slate-100 dark:divide-slate-800">
                   {medications.map((med) => (
                     <li key={med.id}>
-                      <div className="px-8 py-6 hover:bg-slate-50 transition-colors">
+                      <div className="px-8 py-6 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                         <div className="flex items-center justify-between">
-                          <p className="truncate text-sm font-black text-slate-900">{med.name}</p>
+                          <p className="truncate text-sm font-black text-slate-900 dark:text-white">{med.name}</p>
                           <div className="ml-2 flex flex-shrink-0">
-                            <p className="inline-flex rounded-lg bg-emerald-50 px-2.5 py-1 text-[10px] font-black leading-5 text-emerald-700 border border-emerald-100 uppercase tracking-wide">
+                            <p className="inline-flex rounded-lg bg-emerald-50 dark:bg-emerald-900/20 px-2.5 py-1 text-[10px] font-black leading-5 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800 uppercase tracking-wide">
                               Active
                             </p>
                           </div>
