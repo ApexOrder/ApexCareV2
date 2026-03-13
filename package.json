@@ -9,6 +9,9 @@
     "lint": "next lint",
     "postinstall": "prisma generate"
   },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  },
   "dependencies": {
     "@module-federation/nextjs-mf": "^8.1.6",
     "@next-auth/prisma-adapter": "^1.0.7",
