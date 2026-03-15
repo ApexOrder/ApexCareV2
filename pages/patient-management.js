@@ -31,7 +31,7 @@ export default function ServiceUserManagement() {
       regulatedCare: 'Yes',
       languages: 'English',
       religion: 'Methodist',
-      emergencyContact: 'Sarah Miller (Daughter) - (555) 999-8888',
+      emergencyContact: { name: 'Sarah Miller', relation: 'Daughter', phone: '(555) 999-8888' },
       gp: {
         name: 'Dr. A. Smith',
         surgery: 'Springfield Medical Center',
@@ -140,7 +140,7 @@ I would like my carers to provide meal support on each visit. I would like these
       regulatedCare: 'Yes',
       languages: 'English',
       religion: 'None',
-      emergencyContact: 'Father McKenzie (Friend) - (555) 111-0000',
+      emergencyContact: { name: 'Father McKenzie', relation: 'Friend', phone: '(555) 111-0000' },
       gp: {
         name: 'Dr. Robert',
         surgery: 'Liverpool Health Centre',
@@ -237,7 +237,7 @@ I would like my carers to provide meal support on each visit. I would like these
       regulatedCare: 'No',
       languages: 'English',
       religion: 'Agnostic',
-      emergencyContact: 'Ford Prefect (Friend) - (555) 420-0000',
+      emergencyContact: { name: 'Ford Prefect', relation: 'Friend', phone: '(555) 420-0000' },
       gp: {
         name: 'Dr. Adams',
         surgery: 'Galaxy Medical',
@@ -332,7 +332,7 @@ I would like my carers to provide meal support on each visit. I would like these
     email: '', 
     languages: '',
     religion: '',
-    emergencyContact: '', 
+    emergencyContact: { name: '', relation: '', phone: '' }, 
     gpName: '',
     gpContact: '',
     pharmacyName: '',
@@ -477,7 +477,7 @@ I would like my carers to provide meal support on each visit. I would like these
       email: '', 
       languages: '',
       religion: '',
-      emergencyContact: '', 
+      emergencyContact: { name: '', relation: '', phone: '' }, 
       gpName: '',
       gpContact: '',
       pharmacyName: '',
@@ -587,7 +587,7 @@ I would like my carers to provide meal support on each visit. I would like these
             </div>
             <button
               onClick={() => setShowForm(!showForm)}
-              className={`rounded-xl px-6 py-3 text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center gap-2 ${showForm ? 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700' : 'bg-blue-600 text-white shadow-blue-200 hover:bg-blue-700'}`}
+              className={`rounded-xl px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 ${showForm ? 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-200 border-b-4 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700' : 'bg-blue-600 text-white border-b-4 border-blue-800 dark:border-blue-900 hover:bg-blue-700'}`}
             >
               {showForm ? <><X size={14} /> Cancel</> : <><Plus size={14} /> Add Service User</>}
             </button>
@@ -660,7 +660,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="name" id="name" required
                           value={newServiceUser.name}
                           onChange={(e) => setNewServiceUser({...newServiceUser, name: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none" 
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none" 
                         />
                       </div>
                       <div className="sm:col-span-3">
@@ -668,7 +668,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="preferredName" id="preferredName"
                           value={newServiceUser.preferredName}
                           onChange={(e) => setNewServiceUser({...newServiceUser, preferredName: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none" 
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none" 
                         />
                       </div>
                       <div className="sm:col-span-2">
@@ -676,7 +676,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="date" name="dob" id="dob" required
                           value={newServiceUser.dob}
                           onChange={(e) => setNewServiceUser({...newServiceUser, dob: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
@@ -684,7 +684,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <select id="gender" name="gender"
                           value={newServiceUser.gender}
                           onChange={(e) => setNewServiceUser({...newServiceUser, gender: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none bg-white"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none bg-white dark:bg-slate-800"
                         >
                           <option value="">Select...</option>
                           <option>Male</option>
@@ -697,7 +697,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="pronouns" id="pronouns"
                           value={newServiceUser.pronouns}
                           onChange={(e) => setNewServiceUser({...newServiceUser, pronouns: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
@@ -705,7 +705,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="languages" id="languages"
                           value={newServiceUser.languages}
                           onChange={(e) => setNewServiceUser({...newServiceUser, languages: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
@@ -713,7 +713,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="religion" id="religion"
                           value={newServiceUser.religion}
                           onChange={(e) => setNewServiceUser({...newServiceUser, religion: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
@@ -721,7 +721,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <select id="status" name="status"
                           value={newServiceUser.status}
                           onChange={(e) => setNewServiceUser({...newServiceUser, status: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none bg-white"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none bg-white dark:bg-slate-800"
                         >
                           <option>Active</option>
                           <option>Inactive</option>
@@ -733,7 +733,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <select id="pocType" name="pocType"
                           value={newServiceUser.pocType}
                           onChange={(e) => setNewServiceUser({...newServiceUser, pocType: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none bg-white"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none bg-white dark:bg-slate-800"
                         >
                           <option value="">Select...</option>
                           <option>Reablement</option>
@@ -748,7 +748,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <select id="group" name="group"
                           value={newServiceUser.group}
                           onChange={(e) => setNewServiceUser({...newServiceUser, group: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none bg-white"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none bg-white dark:bg-slate-800"
                         >
                           <option value="">Select a group...</option>
                           {availableGroups.map(group => (
@@ -758,7 +758,7 @@ I would like my carers to provide meal support on each visit. I would like these
                       </div>
 
                       {/* Section: Contact & Access */}
-                      <div className="sm:col-span-6 border-b border-slate-100 pb-2 mb-2 mt-4">
+                      <div className="sm:col-span-6 border-b border-slate-100 dark:border-slate-800 pb-2 mb-2 mt-4">
                         <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Contact & Access</h4>
                       </div>
                       <div className="sm:col-span-4 relative">
@@ -770,16 +770,16 @@ I would like my carers to provide meal support on each visit. I would like these
                             setAddressSearch(e.target.value);
                           }}
                           onBlur={() => setTimeout(() => setShowAddressSuggestions(false), 200)}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none bg-slate-50"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none bg-slate-50 dark:bg-slate-800/50"
                         />
                         {showAddressSuggestions && addressSuggestions.length > 0 && (
-                            <div className="absolute z-10 w-full bg-white border border-slate-200 rounded-xl mt-1 shadow-lg max-h-60 overflow-y-auto">
+                            <div className="absolute z-10 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl mt-1 shadow-lg max-h-60 overflow-y-auto">
                                 <ul>
                                     {addressSuggestions.map((address) => (
                                         <li 
                                             key={address.place_id}
                                             onMouseDown={() => handleSelectAddress(address)}
-                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700"
+                                            className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer text-sm text-slate-700 dark:text-slate-300"
                                         >
                                             {address.display_name}
                                         </li>
@@ -794,7 +794,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text"
                           value={addressParts.houseNumber}
                           onChange={(e) => handleAddressPartChange('houseNumber', e.target.value)}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-4">
@@ -802,7 +802,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text"
                           value={addressParts.street}
                           onChange={(e) => handleAddressPartChange('street', e.target.value)}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
@@ -810,7 +810,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text"
                           value={addressParts.town}
                           onChange={(e) => handleAddressPartChange('town', e.target.value)}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
@@ -818,7 +818,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text"
                           value={addressParts.county}
                           onChange={(e) => handleAddressPartChange('county', e.target.value)}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
@@ -826,7 +826,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text"
                           value={addressParts.postcode}
                           onChange={(e) => handleAddressPartChange('postcode', e.target.value)}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
 
@@ -835,7 +835,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="phone" id="phone"
                           value={newServiceUser.phone}
                           onChange={(e) => setNewServiceUser({...newServiceUser, phone: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
@@ -843,7 +843,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="email" name="email" id="email"
                           value={newServiceUser.email}
                           onChange={(e) => setNewServiceUser({...newServiceUser, email: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
@@ -851,7 +851,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="keySafeCode" id="keySafeCode"
                           value={newServiceUser.keySafeCode}
                           onChange={(e) => setNewServiceUser({...newServiceUser, keySafeCode: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
@@ -859,36 +859,38 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="accessInstructions" id="accessInstructions"
                           value={newServiceUser.accessInstructions}
                           onChange={(e) => setNewServiceUser({...newServiceUser, accessInstructions: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
 
                       {/* Section: Care Circle & Legal */}
-                      <div className="sm:col-span-6 border-b border-slate-100 pb-2 mb-2 mt-4">
+                      <div className="sm:col-span-6 border-b border-slate-100 dark:border-slate-800 pb-2 mb-2 mt-4">
                         <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Care Circle & Legal</h4>
                       </div>
-                      <div className="sm:col-span-3">
-                        <label htmlFor="emergencyContact" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Emergency Contact</label>
-                        <input type="text" name="emergencyContact" id="emergencyContact"
-                          value={newServiceUser.emergencyContact}
-                          onChange={(e) => setNewServiceUser({...newServiceUser, emergencyContact: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
-                        />
+                      <div className="sm:col-span-6 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Primary Emergency Contact</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <input type="text" placeholder="Full Name" value={newServiceUser.emergencyContact.name} onChange={(e) => setNewServiceUser({...newServiceUser, emergencyContact: {...newServiceUser.emergencyContact, name: e.target.value}})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none" />
+                            </div>
+                            <div>
+                                <input type="text" placeholder="Relationship" value={newServiceUser.emergencyContact.relation} onChange={(e) => setNewServiceUser({...newServiceUser, emergencyContact: {...newServiceUser.emergencyContact, relation: e.target.value}})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none" />
+                            </div>
+                            <div>
+                                <input type="text" placeholder="Phone Number" value={newServiceUser.emergencyContact.phone} onChange={(e) => setNewServiceUser({...newServiceUser, emergencyContact: {...newServiceUser.emergencyContact, phone: e.target.value}})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none" />
+                            </div>
+                        </div>
                       </div>
-                      <div className="sm:col-span-3">
-                        <label htmlFor="powerOfAttorney" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Power of Attorney</label>
-                        <input type="text" name="powerOfAttorney" id="powerOfAttorney"
-                          value={newServiceUser.powerOfAttorney}
-                          onChange={(e) => setNewServiceUser({...newServiceUser, powerOfAttorney: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
-                        />
+                      <div className="sm:col-span-6 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Power of Attorney</label>
+                        <input type="text" placeholder="Name & Type (e.g. Health/Welfare)" value={newServiceUser.powerOfAttorney} onChange={(e) => setNewServiceUser({...newServiceUser, powerOfAttorney: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none" />
                       </div>
                       <div className="sm:col-span-2">
                         <label htmlFor="gpName" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">GP Name</label>
                         <input type="text" name="gpName" id="gpName"
                           value={newServiceUser.gpName}
                           onChange={(e) => setNewServiceUser({...newServiceUser, gpName: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
@@ -896,7 +898,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="gpContact" id="gpContact"
                           value={newServiceUser.gpContact}
                           onChange={(e) => setNewServiceUser({...newServiceUser, gpContact: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-2">
@@ -904,7 +906,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <select id="dnacpr" name="dnacpr"
                           value={newServiceUser.dnacpr}
                           onChange={(e) => setNewServiceUser({...newServiceUser, dnacpr: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none bg-white"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none bg-white dark:bg-slate-800"
                         >
                           <option value="">Unknown</option>
                           <option value="Yes - On file">Yes - On file</option>
@@ -916,7 +918,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="pharmacyName" id="pharmacyName"
                           value={newServiceUser.pharmacyName}
                           onChange={(e) => setNewServiceUser({...newServiceUser, pharmacyName: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-3">
@@ -924,12 +926,12 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="pharmacyContact" id="pharmacyContact"
                           value={newServiceUser.pharmacyContact}
                           onChange={(e) => setNewServiceUser({...newServiceUser, pharmacyContact: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
 
                       {/* Section: Medical & Care Needs */}
-                      <div className="sm:col-span-6 border-b border-slate-100 pb-2 mb-2 mt-4">
+                      <div className="sm:col-span-6 border-b border-slate-100 dark:border-slate-800 pb-2 mb-2 mt-4">
                         <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Medical & Care Needs</h4>
                       </div>
                       <div className="sm:col-span-6">
@@ -937,7 +939,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="condition" id="condition" required
                           value={newServiceUser.condition}
                           onChange={(e) => setNewServiceUser({...newServiceUser, condition: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none" 
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none" 
                         />
                       </div>
                       <div className="sm:col-span-6">
@@ -945,7 +947,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <textarea rows={2} name="medicalHistory" id="medicalHistory"
                           value={newServiceUser.medicalHistory}
                           onChange={(e) => setNewServiceUser({...newServiceUser, medicalHistory: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-6">
@@ -953,7 +955,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <textarea rows={2} name="riskAssessment" id="riskAssessment"
                           value={newServiceUser.riskAssessment}
                           onChange={(e) => setNewServiceUser({...newServiceUser, riskAssessment: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 outline-none"
                         />
                       </div>
                       <div className="sm:col-span-6">
@@ -961,7 +963,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="mobilityNeeds" id="mobilityNeeds"
                           value={newServiceUser.mobilityNeeds}
                           onChange={(e) => setNewServiceUser({...newServiceUser, mobilityNeeds: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-6">
@@ -969,7 +971,7 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="nutritionNeeds" id="nutritionNeeds"
                           value={newServiceUser.nutritionNeeds}
                           onChange={(e) => setNewServiceUser({...newServiceUser, nutritionNeeds: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
                       <div className="sm:col-span-6">
@@ -977,12 +979,12 @@ I would like my carers to provide meal support on each visit. I would like these
                         <input type="text" name="personalCareNeeds" id="personalCareNeeds"
                           value={newServiceUser.personalCareNeeds}
                           onChange={(e) => setNewServiceUser({...newServiceUser, personalCareNeeds: e.target.value})}
-                          className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 outline-none"
+                          className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white outline-none"
                         />
                       </div>
 
                       {/* Section: Person-Centered Care */}
-                      <div className="sm:col-span-6 border-b border-slate-100 pb-2 mb-2 mt-4">
+                      <div className="sm:col-span-6 border-b border-slate-100 dark:border-slate-800 pb-2 mb-2 mt-4">
                         <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Person-Centered Care</h4>
                       </div>
                       <div className="sm:col-span-6">
@@ -1035,14 +1037,14 @@ I would like my carers to provide meal support on each visit. I would like these
                                   : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
                               }`}
                             >
-                              {group} {newServiceUser.groups?.includes(group) && 'â'}
+                              {group} {newServiceUser.groups?.includes(group) && 'Ã¢ÂÂ'}
                             </button>
                           ))}
                         </div>
                       </div>
                     </div>
                     <div className="flex justify-end">
-                      <button type="submit" className="ml-3 inline-flex justify-center rounded-xl border border-transparent bg-blue-600 py-3 px-6 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-blue-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all active:scale-95">
+                      <button type="submit" className="ml-3 inline-flex justify-center rounded-xl border-b-4 border-blue-800 dark:border-blue-900 bg-blue-600 py-3 px-6 text-[10px] font-black uppercase tracking-widest text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all active:scale-95">
                         Save Service User
                       </button>
                     </div>

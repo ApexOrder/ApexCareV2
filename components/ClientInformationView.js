@@ -83,8 +83,8 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
 
     // Local state for editing care details
     const [editCare, setEditCare] = useState({
-        emergencyContact: client.emergencyContact || '',
-        secondaryContact: client.secondaryContact || '',
+        emergencyContact: typeof client.emergencyContact === 'string' ? { name: client.emergencyContact, relation: '', phone: '' } : (client.emergencyContact || { name: '', relation: '', phone: '' }),
+        secondaryContact: typeof client.secondaryContact === 'string' ? { name: client.secondaryContact, relation: '', phone: '' } : (client.secondaryContact || { name: '', relation: '', phone: '' }),
         nextOfKin: client.nextOfKin || '',
         powerOfAttorney: client.powerOfAttorney || '',
         allergies: client.allergies ? client.allergies.join(', ') : '',
@@ -377,9 +377,9 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
         {
             title: 'Personal Details',
             icon: User,
-            color: 'text-blue-600',
-            bg: 'bg-blue-50/50',
-            border: 'border-blue-100',
+            color: 'text-blue-600 dark:text-blue-400',
+            bg: 'bg-blue-50/50 dark:bg-blue-900/10',
+            border: 'border-blue-100 dark:border-blue-800/30',
             fields: [
                 { label: 'Title', key: 'title', type: 'select', options: ['Mr', 'Mrs', 'Ms', 'Miss', 'Dr', 'Mx', 'Other'] },
                 { label: 'First Name', key: 'firstName' },
@@ -394,9 +394,9 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
         {
             title: 'Cultural Context',
             icon: Globe,
-            color: 'text-amber-600',
-            bg: 'bg-amber-50/50',
-            border: 'border-amber-100',
+            color: 'text-amber-600 dark:text-amber-500',
+            bg: 'bg-amber-50/50 dark:bg-amber-900/10',
+            border: 'border-amber-100 dark:border-amber-800/30',
             fields: [
                 { label: 'Ethnicity', key: 'ethnicity', type: 'select', options: ['White British', 'White Irish', 'White Other', 'Black Caribbean', 'Black African', 'Black Other', 'Indian', 'Pakistani', 'Bangladeshi', 'Chinese', 'Asian Other', 'Mixed', 'Other', 'Prefer not to say'] },
                 { label: 'Religion', key: 'religion', type: 'select', options: ['No Religion', 'Christian', 'Buddhist', 'Hindu', 'Jewish', 'Muslim', 'Sikh', 'Other', 'Prefer not to say'] },
@@ -408,9 +408,9 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
         {
             title: 'Service & Governance',
             icon: ClipboardCheck,
-            color: 'text-purple-600',
-            bg: 'bg-purple-50/50',
-            border: 'border-purple-100',
+            color: 'text-purple-600 dark:text-purple-400',
+            bg: 'bg-purple-50/50 dark:bg-purple-900/10',
+            border: 'border-purple-100 dark:border-purple-800/30',
             fields: [
                 { label: 'NHS Number', key: 'nhsNumber' },
                 { label: 'Local Authority ID', key: 'pidNumber' },
@@ -428,15 +428,15 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4">
             {/* Identity & Contact Records */}
-            <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #3b82f6' }}>
-                <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Identity & Contact Records</h3>
+            <section className="bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #3b82f6' }}>
+                <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Identity & Contact Records</h3>
                     {userRole === 'admin' && (!isEditingIdentity ? (
-                        <button onClick={() => setIsEditingIdentity(true)} className="px-6 py-3 bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 transition-colors">Edit Details</button>
+                        <button onClick={() => setIsEditingIdentity(true)} className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Edit Details</button>
                     ) : (
                         <div className="flex gap-3">
-                            <button onClick={() => setIsEditingIdentity(false)} className="px-6 py-3 bg-slate-100 text-slate-500 text-[10px] font-black uppercase rounded-xl hover:bg-slate-200">Cancel</button>
-                            <button onClick={handleUpdateIdentity} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl shadow-lg shadow-emerald-200">Save Changes</button>
+                            <button onClick={() => setIsEditingIdentity(false)} className="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase border-b-4 border-transparent rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
+                            <button onClick={handleUpdateIdentity} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl border-b-4 border-emerald-800 dark:border-emerald-900 hover:bg-emerald-700 transition-all active:scale-95">Save Changes</button>
                         </div>
                     ))}
                 </div>
@@ -453,7 +453,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                         <label className={`text-[9px] font-black uppercase tracking-widest ${group.color} opacity-70`}>{item.label}</label>
                                         {isEditingIdentity ? (
                                             item.type === 'select' ? (
-                                                <select value={editIdentity[item.key]} onChange={(e) => setEditIdentity({...editIdentity, [item.key]: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-xs font-bold text-slate-900 p-2.5 bg-white">
+                                                <select value={editIdentity[item.key]} onChange={(e) => setEditIdentity({...editIdentity, [item.key]: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-xs font-bold text-slate-900 dark:text-white p-2.5 bg-white dark:bg-slate-900">
                                                     <option value="">Not Assigned</option>
                                                     {item.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                                 </select>
@@ -462,11 +462,11 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                                     type={item.type || 'text'}
                                                     value={editIdentity[item.key]}
                                                     onChange={(e) => setEditIdentity({...editIdentity, [item.key]: e.target.value})}
-                                                    className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-xs font-bold text-slate-900 p-2.5"
+                                                    className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-xs font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900 p-2.5"
                                                 />
                                             )
                                         ) : (
-                                            <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">{(item.getValue ? item.getValue(client) : client[item.key]) || 'â'}</p>
+                                            <p className="text-sm font-bold text-slate-900 dark:text-white mt-0.5 truncate">{(item.getValue ? item.getValue(client) : client[item.key]) || '—'}</p>
                                         )}
                                     </div>
                                 ))}
@@ -475,45 +475,45 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                     ))}
 
                     {/* Custom Contact Information Card - Moved here */}
-                    <div className="rounded-3xl p-6 border border-emerald-100 bg-emerald-50/50 space-y-6">
+                    <div className="rounded-3xl p-6 border border-emerald-100 dark:border-emerald-800/30 bg-emerald-50/50 dark:bg-emerald-900/10 space-y-6">
                         <div className="flex items-center gap-3 mb-2">
-                            <span className="text-emerald-600"><Phone size={24} /></span>
-                            <h4 className="text-lg font-black uppercase tracking-tight text-emerald-600">Contact Information</h4>
+                            <span className="text-emerald-600 dark:text-emerald-500"><Phone size={24} /></span>
+                            <h4 className="text-lg font-black uppercase tracking-tight text-emerald-600 dark:text-emerald-500">Contact Information</h4>
                         </div>
                         <div className="space-y-6">
                             {/* Primary Client Contact */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="text-[9px] font-black uppercase tracking-widest text-emerald-600 opacity-70">Phone Number</label>
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500 opacity-70">Phone Number</label>
                                     {isEditingIdentity ? (
-                                        <input type="text" value={editContacts.phone} onChange={(e) => setEditContacts({...editContacts, phone: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs font-bold text-slate-900 p-2.5" />
+                                        <input type="text" value={editContacts.phone} onChange={(e) => setEditContacts({...editContacts, phone: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs font-bold p-2.5" />
                                     ) : (
-                                        <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">{client.phone || 'â'}</p>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white mt-0.5 truncate">{client.phone || 'Ã¢ÂÂ'}</p>
                                     )}
                                 </div>
                                 <div>
-                                    <label className="text-[9px] font-black uppercase tracking-widest text-emerald-600 opacity-70">Email Address</label>
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500 opacity-70">Email Address</label>
                                     {isEditingIdentity ? (
-                                        <input type="email" value={editContacts.email} onChange={(e) => setEditContacts({...editContacts, email: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs font-bold text-slate-900 p-2.5" />
+                                        <input type="email" value={editContacts.email} onChange={(e) => setEditContacts({...editContacts, email: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs font-bold p-2.5" />
                                     ) : (
-                                        <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">{client.email || 'â'}</p>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white mt-0.5 truncate">{client.email || 'Ã¢ÂÂ'}</p>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="h-px bg-emerald-200/50"></div>
+                            <div className="h-px bg-emerald-200/50 dark:bg-emerald-800/30"></div>
 
                             {/* Multiple Contacts Loop */}
                             <div>
                                 <div className="flex justify-between items-center mb-3">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Next of Kin / Contacts</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500">Next of Kin / Contacts</label>
                                     {isEditingIdentity && (
-                                        <button onClick={handleAddContact} className="text-[10px] font-bold text-emerald-600 bg-white border border-emerald-200 px-2 py-1 rounded-lg hover:bg-emerald-50 transition-colors flex items-center"><Plus size={12} className="mr-1" /> Add</button>
+                                        <button onClick={handleAddContact} className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800/50 px-2 py-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors flex items-center"><Plus size={12} className="mr-1" /> Add</button>
                                     )}
                                 </div>
                                 <div className="space-y-4">
-                                    {(isEditingIdentity ? editContacts.contacts : (client.contacts && client.contacts.length > 0 ? client.contacts : [{ name: client.nextOfKin || 'â', relation: client.nextOfKinRelation || '', phone: '', address: '' }])).map((contact, idx) => (
-                                        <div key={idx} className="bg-white/50 rounded-xl p-3 border border-emerald-100 relative group">
+                                    {(isEditingIdentity ? editContacts.contacts : (client.contacts && client.contacts.length > 0 ? client.contacts : [{ name: client.nextOfKin || 'Ã¢ÂÂ', relation: client.nextOfKinRelation || '', phone: '', address: '' }])).map((contact, idx) => (
+                                        <div key={idx} className="bg-white/50 dark:bg-slate-800/50 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800/30 relative group">
                                             {isEditingIdentity && idx > 0 && (
                                                 <button onClick={() => handleRemoveContact(idx)} className="absolute top-2 right-2 text-rose-400 hover:text-rose-600"><X size={14} /></button>
                                             )}
@@ -521,32 +521,32 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                                 <div>
                                                     <label className="text-[8px] font-bold text-emerald-500 uppercase">Name</label>
                                                     {isEditingIdentity ? (
-                                                        <input type="text" value={contact.name} onChange={(e) => { const newContacts = [...editContacts.contacts]; newContacts[idx].name = e.target.value; setEditContacts({...editContacts, contacts: newContacts}); }} className="w-full mt-0.5 rounded-lg border-slate-200 text-xs font-bold p-1.5" placeholder="Name" />
-                                                    ) : <p className="text-xs font-bold text-slate-900">{contact.name}</p>}
+                                                        <input type="text" value={contact.name} onChange={(e) => { const newContacts = [...editContacts.contacts]; newContacts[idx].name = e.target.value; setEditContacts({...editContacts, contacts: newContacts}); }} className="w-full mt-0.5 rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-bold p-1.5" placeholder="Name" />
+                                                    ) : <p className="text-xs font-bold text-slate-900 dark:text-white">{contact.name}</p>}
                                                 </div>
                                                 <div>
                                                     <label className="text-[8px] font-bold text-emerald-500 uppercase">Relationship</label>
                                                     {isEditingIdentity ? (
-                                                        <select value={contact.relation} onChange={(e) => { const newContacts = [...editContacts.contacts]; newContacts[idx].relation = e.target.value; setEditContacts({...editContacts, contacts: newContacts}); }} className="w-full mt-0.5 rounded-lg border-slate-200 text-xs font-bold p-1.5 bg-white">
+                                                        <select value={contact.relation} onChange={(e) => { const newContacts = [...editContacts.contacts]; newContacts[idx].relation = e.target.value; setEditContacts({...editContacts, contacts: newContacts}); }} className="w-full mt-0.5 rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-bold p-1.5">
                                                             <option value="">Select...</option>
                                                             {['Family', 'Wife', 'Husband', 'Son', 'Daughter', 'Brother', 'Sister', 'Partner', 'Friend', 'Other'].map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                                         </select>
-                                                    ) : <p className="text-xs font-bold text-slate-900">{contact.relation}</p>}
+                                                    ) : <p className="text-xs font-bold text-slate-900 dark:text-white">{contact.relation}</p>}
                                                 </div>
                                                 <div>
                                                     <label className="text-[8px] font-bold text-emerald-500 uppercase">Phone Number</label>
                                                     {isEditingIdentity ? (
-                                                        <input type="text" value={contact.phone} onChange={(e) => { const newContacts = [...editContacts.contacts]; newContacts[idx].phone = e.target.value; setEditContacts({...editContacts, contacts: newContacts}); }} className="w-full mt-0.5 rounded-lg border-slate-200 text-xs font-bold p-1.5" placeholder="Number" />
-                                                    ) : <p className="text-xs font-bold text-slate-900">{contact.phone || 'â'}</p>}
+                                                        <input type="text" value={contact.phone} onChange={(e) => { const newContacts = [...editContacts.contacts]; newContacts[idx].phone = e.target.value; setEditContacts({...editContacts, contacts: newContacts}); }} className="w-full mt-0.5 rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-bold p-1.5" placeholder="Number" />
+                                                    ) : <p className="text-xs font-bold text-slate-900 dark:text-white">{contact.phone || 'Ã¢ÂÂ'}</p>}
                                                 </div>
                                                 <div>
                                                     <label className="text-[8px] font-bold text-emerald-500 uppercase">Address</label>
                                                     {isEditingIdentity ? (
-                                                        <input type="text" value={contact.address} onChange={(e) => { const newContacts = [...editContacts.contacts]; newContacts[idx].address = e.target.value; setEditContacts({...editContacts, contacts: newContacts}); }} className="w-full mt-0.5 rounded-lg border-slate-200 text-xs font-bold p-1.5" placeholder="Address" />
-                                                    ) : <p className="text-xs font-bold text-slate-900 truncate">{contact.address || 'â'}</p>}
+                                                        <input type="text" value={contact.address} onChange={(e) => { const newContacts = [...editContacts.contacts]; newContacts[idx].address = e.target.value; setEditContacts({...editContacts, contacts: newContacts}); }} className="w-full mt-0.5 rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-bold p-1.5" placeholder="Address" />
+                                                    ) : <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{contact.address || 'Ã¢ÂÂ'}</p>}
                                     {contact.address && !isEditingIdentity && (
-                                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contact.address)}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase text-blue-600 hover:underline block mt-1">
-                                            Open Map â
+                                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contact.address)}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 hover:underline block mt-1">
+                                            Open Map Ã¢ÂÂ
                                         </a>
                                     )}
                                 </div>
@@ -556,13 +556,13 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                 </div>
                             </div>
 
-                            <div className="h-px bg-emerald-200/50"></div>
+                            <div className="h-px bg-emerald-200/50 dark:bg-emerald-800/30"></div>
 
                             {/* GP & Pharmacy */}
                             <div className="grid grid-cols-1 gap-4">
                                 {[{ label: 'GP', key: 'gp' }, { label: 'Pharmacy', key: 'pharmacy' }].map(provider => (
-                                    <div key={provider.key} className="bg-white/50 rounded-xl p-3 border border-emerald-100">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2">{provider.label}</p>
+                                    <div key={provider.key} className="bg-white/50 dark:bg-slate-800/50 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800/30">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500 mb-2">{provider.label}</p>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                             {['Name', 'Address', 'Phone'].map(field => (
                                                 <div key={field} className={field === 'Address' ? 'sm:col-span-2' : ''}>
@@ -572,15 +572,15 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                                             type="text" 
                                                             value={editContacts[provider.key][field.toLowerCase()] || ''} 
                                                             onChange={(e) => setEditContacts({...editContacts, [provider.key]: { ...editContacts[provider.key], [field.toLowerCase()]: e.target.value }})} 
-                                                            className="w-full mt-0.5 rounded-lg border-slate-200 text-xs font-bold p-1.5" 
+                                                            className="w-full mt-0.5 rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-bold p-1.5" 
                                                             placeholder={field} 
                                                         />
                                                     ) : (
-                                                        <p className="text-xs font-bold text-slate-900">{client[provider.key]?.[field.toLowerCase()] || (field === 'Name' ? client[provider.key]?.name : '') || 'â'}</p>
+                                                        <p className="text-xs font-bold text-slate-900 dark:text-white">{client[provider.key]?.[field.toLowerCase()] || (field === 'Name' ? client[provider.key]?.name : '') || '—'}</p>
                                                     )}
                                                     {field === 'Address' && !isEditingIdentity && client[provider.key]?.address && (
-                                                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(client[provider.key]?.address)}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase text-blue-600 hover:underline block mt-1">
-                                                            Open Map â
+                                                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(client[provider.key]?.address)}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 hover:underline block mt-1">
+                                                            Open Map Ã¢ÂÂ
                                                         </a>
                                                     )}
                                                 </div>
@@ -604,7 +604,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                         <label className={`text-[9px] font-black uppercase tracking-widest ${group.color} opacity-70`}>{item.label}</label>
                                         {isEditingIdentity ? (
                                             item.type === 'select' ? (
-                                                <select value={editIdentity[item.key]} onChange={(e) => setEditIdentity({...editIdentity, [item.key]: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-xs font-bold text-slate-900 p-2.5 bg-white">
+                                                <select value={editIdentity[item.key]} onChange={(e) => setEditIdentity({...editIdentity, [item.key]: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-xs font-bold text-slate-900 dark:text-white p-2.5 bg-white dark:bg-slate-900">
                                                     <option value="">Not Assigned</option>
                                                     {item.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                                 </select>
@@ -613,11 +613,11 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                                     type={item.type || 'text'}
                                                     value={editIdentity[item.key]}
                                                     onChange={(e) => setEditIdentity({...editIdentity, [item.key]: e.target.value})}
-                                                    className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-xs font-bold text-slate-900 p-2.5"
+                                                    className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-xs font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900 p-2.5"
                                                 />
                                             )
                                         ) : (
-                                            <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">{(item.getValue ? item.getValue(client) : client[item.key]) || 'â'}</p>
+                                            <p className="text-sm font-bold text-slate-900 dark:text-white mt-0.5 truncate">{(item.getValue ? item.getValue(client) : client[item.key]) || '—'}</p>
                                         )}
                                     </div>
                                 ))}
@@ -628,19 +628,19 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
             </section>
 
             {/* Address & Location */}
-            <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #3b82f6' }}>
-                <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Address & Location</h3>
+            <section className="bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #3b82f6' }}>
+                <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Address & Location</h3>
                     {userRole === 'admin' && (!isEditingAddress ? (
-                        <button onClick={() => setIsEditingAddress(true)} className="px-6 py-3 bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 transition-colors">Edit Address</button>
+                        <button onClick={() => setIsEditingAddress(true)} className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Edit Address</button>
                     ) : (
                         <div className="flex gap-3">
                             <button onClick={() => { 
                                 setIsEditingAddress(false); 
                                 setEditAddress({ houseNumber: '', street: client.address || '', town: '', county: '', postcode: '', keySafeCode: client.keySafeCode || client.environment?.accessCode || '' }); 
                                 setAddressSearch('');
-                            }} className="px-6 py-3 bg-slate-100 text-slate-500 text-[10px] font-black uppercase rounded-xl hover:bg-slate-200">Cancel</button>
-                            <button onClick={handleUpdateAddress} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl shadow-lg shadow-emerald-200">Save Changes</button>
+                            }} className="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase border-b-4 border-transparent rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
+                            <button onClick={handleUpdateAddress} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl border-b-4 border-emerald-800 dark:border-emerald-900 hover:bg-emerald-700 transition-all active:scale-95">Save Changes</button>
                         </div>
                     ))}
                 </div>
@@ -653,7 +653,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                         <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 block">Search Address</label>
                                         <input 
                                             type="text"
-                                            className="w-full bg-blue-50 border-blue-200 rounded-xl p-3 font-bold text-blue-900 outline-none border focus:ring-2 focus:ring-blue-500/20 placeholder-blue-300" 
+                                            className="w-full bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50 rounded-xl p-3 font-bold text-blue-900 dark:text-blue-100 outline-none border focus:ring-2 focus:ring-blue-500/20 placeholder-blue-300 dark:placeholder-blue-700" 
                                             placeholder="Start typing to auto-fill..."
                                             value={addressSearch}
                                             onChange={(e) => {
@@ -663,13 +663,13 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                             onBlur={() => setTimeout(() => setShowAddressSuggestions(false), 200)}
                                         />
                                         {showAddressSuggestions && addressSuggestions.length > 0 && (
-                                            <div className="absolute z-10 w-full bg-white border border-slate-200 rounded-2xl mt-1 shadow-lg max-h-60 overflow-y-auto">
+                                            <div className="absolute z-10 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl mt-1 shadow-lg max-h-60 overflow-y-auto">
                                                 <ul>
                                                     {addressSuggestions.map((address) => (
                                                         <li 
                                                             key={address.place_id}
                                                             onMouseDown={() => handleSelectAddress(address)}
-                                                            className="px-4 py-3 hover:bg-slate-50 cursor-pointer text-sm font-medium text-slate-700"
+                                                            className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300"
                                                         >
                                                             {address.display_name}
                                                         </li>
@@ -682,33 +682,33 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                     <div className="space-y-4">
                                         <div>
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">House Name / Number</label>
-                                            <input type="text" className="w-full mt-1 bg-white border-slate-300 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20" value={editAddress.houseNumber} onChange={(e) => setEditAddress({...editAddress, houseNumber: e.target.value})} />
+                                            <input type="text" className="w-full mt-1 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-xl p-3 font-bold text-slate-900 dark:text-white outline-none border focus:ring-2 focus:ring-blue-500/20" value={editAddress.houseNumber} onChange={(e) => setEditAddress({...editAddress, houseNumber: e.target.value})} />
                                         </div>
                                         <div>
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Street</label>
-                                            <input type="text" className="w-full mt-1 bg-white border-slate-300 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20" value={editAddress.street} onChange={(e) => setEditAddress({...editAddress, street: e.target.value})} />
+                                            <input type="text" className="w-full mt-1 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-xl p-3 font-bold text-slate-900 dark:text-white outline-none border focus:ring-2 focus:ring-blue-500/20" value={editAddress.street} onChange={(e) => setEditAddress({...editAddress, street: e.target.value})} />
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Town / City</label>
-                                                <input type="text" className="w-full mt-1 bg-white border-slate-300 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20" value={editAddress.town} onChange={(e) => setEditAddress({...editAddress, town: e.target.value})} />
+                                                <input type="text" className="w-full mt-1 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-xl p-3 font-bold text-slate-900 dark:text-white outline-none border focus:ring-2 focus:ring-blue-500/20" value={editAddress.town} onChange={(e) => setEditAddress({...editAddress, town: e.target.value})} />
                                             </div>
                                             <div>
                                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">County</label>
-                                                <input type="text" className="w-full mt-1 bg-white border-slate-300 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20" value={editAddress.county} onChange={(e) => setEditAddress({...editAddress, county: e.target.value})} />
+                                                <input type="text" className="w-full mt-1 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-xl p-3 font-bold text-slate-900 dark:text-white outline-none border focus:ring-2 focus:ring-blue-500/20" value={editAddress.county} onChange={(e) => setEditAddress({...editAddress, county: e.target.value})} />
                                             </div>
                                         </div>
                                         <div>
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Postcode</label>
-                                            <input type="text" className="w-full mt-1 bg-white border-slate-300 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20" value={editAddress.postcode} onChange={(e) => setEditAddress({...editAddress, postcode: e.target.value})} />
+                                            <input type="text" className="w-full mt-1 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-xl p-3 font-bold text-slate-900 dark:text-white outline-none border focus:ring-2 focus:ring-blue-500/20" value={editAddress.postcode} onChange={(e) => setEditAddress({...editAddress, postcode: e.target.value})} />
                                         </div>
-                                        <div className="pt-4 border-t border-slate-100">
+                                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Key Safe Code</label>
-                                            <input type="text" className="w-full mt-1 bg-white border-slate-300 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20" value={editAddress.keySafeCode} onChange={(e) => setEditAddress({...editAddress, keySafeCode: e.target.value})} />
+                                            <input type="text" className="w-full mt-1 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-xl p-3 font-bold text-slate-900 dark:text-white outline-none border focus:ring-2 focus:ring-blue-500/20" value={editAddress.keySafeCode} onChange={(e) => setEditAddress({...editAddress, keySafeCode: e.target.value})} />
                                         </div>
                                         <div>
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Property Type</label>
-                                            <select value={editAddress.propertyType} onChange={(e) => setEditAddress({...editAddress, propertyType: e.target.value})} className="w-full mt-1 bg-white border-slate-300 rounded-xl p-3 font-bold text-slate-900 outline-none border focus:ring-2 focus:ring-blue-500/20">
+                                            <select value={editAddress.propertyType} onChange={(e) => setEditAddress({...editAddress, propertyType: e.target.value})} className="w-full mt-1 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-xl p-3 font-bold text-slate-900 dark:text-white outline-none border focus:ring-2 focus:ring-blue-500/20">
                                                 <option value="House">House</option>
                                                 <option value="Flat">Flat</option>
                                                 <option value="Bungalow">Bungalow</option>
@@ -722,27 +722,27 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                     <div className="flex justify-between items-center mb-2">
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Primary Address</label>
                                         {client.address && (
-                                            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(client.address)}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase text-blue-600 hover:underline">
-                                                Open Map â
+                                            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(client.address)}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 hover:underline">
+                                                Open Map Ã¢ÂÂ
                                             </a>
                                         )}
                                     </div>
-                                    <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 text-slate-900 font-bold text-lg leading-relaxed">{client.address || 'No address recorded.'}</div>
+                                    <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold text-lg leading-relaxed">{client.address || 'No address recorded.'}</div>
                                     <div className="mt-6">
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Key Safe Code</label>
-                                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-slate-900 font-bold text-lg mt-1">{client.keySafeCode || client.environment?.accessCode || 'Not Recorded'}</div>
+                                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold text-lg mt-1">{client.keySafeCode || client.environment?.accessCode || 'Not Recorded'}</div>
                                     </div>
                                     <div className="mt-6">
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Property Type</label>
-                                        <div className="text-sm font-bold text-slate-700 mt-1">{client.propertyType || 'Not Recorded'}</div>
+                                        <div className="text-sm font-bold text-slate-700 dark:text-slate-300 mt-1">{client.propertyType || 'Not Recorded'}</div>
                                     </div>
                                 </>
                             )}
                         </div>
-                        <div className="lg:col-span-2 h-64 lg:h-auto min-h-[16rem] bg-slate-100 rounded-2xl border border-slate-200 overflow-hidden relative">
+                        <div className="lg:col-span-2 h-64 lg:h-auto min-h-[16rem] bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden relative">
                             <iframe width="100%" height="100%" src={`https://maps.google.com/maps?q=${encodeURIComponent(mapAddress || '')}&t=&z=15&ie=UTF8&iwloc=&output=embed`} frameBorder="0" scrolling="no" marginHeight="0" marginWidth="0" className="absolute inset-0"></iframe>
                             {!mapAddress && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-slate-50/80 backdrop-blur-sm">
+                                <div className="absolute inset-0 flex items-center justify-center bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-sm">
                                     <p className="text-slate-400 font-bold text-sm">No address to display map</p>
                                 </div>
                             )}
@@ -752,15 +752,15 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
             </section>
 
             {/* Care & Safety Profile */}
-            <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #f43f5e' }}>
-                <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Care & Safety Profile</h3>
+            <section className="bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #f43f5e' }}>
+                <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Care & Safety Profile</h3>
                     {userRole === 'admin' && (!isEditingCare ? (
-                        <button onClick={() => setIsEditingCare(true)} className="px-6 py-3 bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 transition-colors">Edit Profile</button>
+                        <button onClick={() => setIsEditingCare(true)} className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Edit Profile</button>
                     ) : (
                         <div className="flex gap-3">
-                            <button onClick={() => setIsEditingCare(false)} className="px-6 py-3 bg-slate-100 text-slate-500 text-[10px] font-black uppercase rounded-xl hover:bg-slate-200">Cancel</button>
-                            <button onClick={handleUpdateCare} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl shadow-lg shadow-emerald-200">Save Changes</button>
+                            <button onClick={() => setIsEditingCare(false)} className="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase border-b-4 border-transparent rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
+                            <button onClick={handleUpdateCare} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl border-b-4 border-emerald-800 dark:border-emerald-900 hover:bg-emerald-700 transition-all active:scale-95">Save Changes</button>
                         </div>
                     ))}
                 </div>
@@ -768,36 +768,60 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                     <div className="md:col-span-2">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Allergies</label>
                         {isEditingCare ? (
-                            <input type="text" value={editCare.allergies} onChange={(e) => setEditCare({...editCare, allergies: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" placeholder="e.g. Penicillin, Latex" />
+                            <input type="text" value={editCare.allergies} onChange={(e) => setEditCare({...editCare, allergies: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900" placeholder="e.g. Penicillin, Latex" />
                         ) : (
-                            <div className="flex flex-wrap gap-2 mt-2">{client.allergies && client.allergies.length > 0 ? client.allergies.map(a => <span key={a} className="px-3 py-1 bg-rose-50 text-rose-700 rounded-lg text-xs font-bold border border-rose-100">{a}</span>) : <span className="text-sm font-bold text-slate-400">NKDA</span>}</div>
+                            <div className="flex flex-wrap gap-2 mt-2">{client.allergies && client.allergies.length > 0 ? client.allergies.map(a => <span key={a} className="px-3 py-1 bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400 rounded-lg text-xs font-bold border border-rose-100 dark:border-rose-800/30">{a}</span>) : <span className="text-sm font-bold text-slate-400">NKDA</span>}</div>
                         )}
                     </div>
                     
-                    <div>
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Emergency Contact</label>
+                    <div className="md:col-span-2 bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Primary Emergency Contact</label>
                         {isEditingCare ? (
-                            <input type="text" value={editCare.emergencyContact} onChange={(e) => setEditCare({...editCare, emergencyContact: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" />
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <input type="text" value={editCare.emergencyContact.name} onChange={(e) => setEditCare({...editCare, emergencyContact: {...editCare.emergencyContact, name: e.target.value}})} className="w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900" placeholder="Name" />
+                                <input type="text" value={editCare.emergencyContact.relation} onChange={(e) => setEditCare({...editCare, emergencyContact: {...editCare.emergencyContact, relation: e.target.value}})} className="w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900" placeholder="Relationship" />
+                                <input type="text" value={editCare.emergencyContact.phone} onChange={(e) => setEditCare({...editCare, emergencyContact: {...editCare.emergencyContact, phone: e.target.value}})} className="w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900" placeholder="Phone Number" />
+                            </div>
                         ) : (
-                            <p className="text-sm font-bold text-slate-900 mt-1">{editCare.emergencyContact || 'Not Recorded'}</p>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">{editCare.emergencyContact.name || 'Not Recorded'}</p>
+                                {editCare.emergencyContact.relation && <span className="text-[10px] font-bold text-slate-500 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg uppercase tracking-widest">{editCare.emergencyContact.relation}</span>}
+                                {editCare.emergencyContact.phone && (
+                                    <a href={`tel:${editCare.emergencyContact.phone.replace(/[^0-9+]/g, '')}`} className="text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1.5">
+                                        <Phone size={14} /> {editCare.emergencyContact.phone}
+                                    </a>
+                                )}
+                            </div>
                         )}
                     </div>
 
-                    <div>
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Secondary Emergency Contact</label>
+                    <div className="md:col-span-2 bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Secondary Emergency Contact</label>
                         {isEditingCare ? (
-                            <input type="text" value={editCare.secondaryContact} onChange={(e) => setEditCare({...editCare, secondaryContact: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" placeholder="Name, Relation & Phone" />
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <input type="text" value={editCare.secondaryContact.name} onChange={(e) => setEditCare({...editCare, secondaryContact: {...editCare.secondaryContact, name: e.target.value}})} className="w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900" placeholder="Name" />
+                                <input type="text" value={editCare.secondaryContact.relation} onChange={(e) => setEditCare({...editCare, secondaryContact: {...editCare.secondaryContact, relation: e.target.value}})} className="w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900" placeholder="Relationship" />
+                                <input type="text" value={editCare.secondaryContact.phone} onChange={(e) => setEditCare({...editCare, secondaryContact: {...editCare.secondaryContact, phone: e.target.value}})} className="w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900" placeholder="Phone Number" />
+                            </div>
                         ) : (
-                            <p className="text-sm font-bold text-slate-900 mt-1">{editCare.secondaryContact || 'Not Recorded'}</p>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">{editCare.secondaryContact.name || 'Not Recorded'}</p>
+                                {editCare.secondaryContact.relation && <span className="text-[10px] font-bold text-slate-500 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg uppercase tracking-widest">{editCare.secondaryContact.relation}</span>}
+                                {editCare.secondaryContact.phone && (
+                                    <a href={`tel:${editCare.secondaryContact.phone.replace(/[^0-9+]/g, '')}`} className="text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1.5">
+                                        <Phone size={14} /> {editCare.secondaryContact.phone}
+                                    </a>
+                                )}
+                            </div>
                         )}
                     </div>
 
                     <div>
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Power of Attorney</label>
                         {isEditingCare ? (
-                            <input type="text" value={editCare.powerOfAttorney} onChange={(e) => setEditCare({...editCare, powerOfAttorney: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" placeholder="Name & Type (e.g. Health/Welfare)" />
+                            <input type="text" value={editCare.powerOfAttorney} onChange={(e) => setEditCare({...editCare, powerOfAttorney: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900" placeholder="Name & Type (e.g. Health/Welfare)" />
                         ) : (
-                            <p className="text-sm font-bold text-slate-900 mt-1">{editCare.powerOfAttorney || 'Not Recorded'}</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">{editCare.powerOfAttorney || 'Not Recorded'}</p>
                         )}
                     </div>
 
@@ -811,7 +835,7 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                         ) : (
                             <div className="mt-1 flex items-center gap-2">
                                 <span className={`w-2 h-2 rounded-full ${editCare.dnacpr ? 'bg-rose-500' : 'bg-emerald-500'}`}></span>
-                                <p className="text-sm font-bold text-slate-900">{editCare.dnacpr ? 'DNACPR In Place' : 'Attempt Resuscitation'}</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">{editCare.dnacpr ? 'DNACPR In Place' : 'Attempt Resuscitation'}</p>
                             </div>
                         )}
                     </div>
@@ -819,13 +843,13 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                     <div>
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">ReSPECT Form</label>
                         {isEditingCare ? (
-                            <select value={editCare.respecStatus} onChange={(e) => setEditCare({...editCare, respecStatus: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900">
+                            <select value={editCare.respecStatus} onChange={(e) => setEditCare({...editCare, respecStatus: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900">
                                 <option value="Not in place">Not in place</option>
                                 <option value="In place">In place</option>
                                 <option value="Pending">Pending</option>
                             </select>
                         ) : (
-                            <p className="text-sm font-bold text-slate-900 mt-1">{editCare.respecStatus}</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">{editCare.respecStatus}</p>
                         )}
                     </div>
 
@@ -833,71 +857,71 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                     <div>
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">District Nurse</label>
                         {isEditingCare ? (
-                            <input type="text" value={editCare.districtNurse} onChange={(e) => setEditCare({...editCare, districtNurse: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" placeholder="Name & Phone" />
+                            <input type="text" value={editCare.districtNurse} onChange={(e) => setEditCare({...editCare, districtNurse: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900" placeholder="Name & Phone" />
                         ) : (
-                            <p className="text-sm font-bold text-slate-900 mt-1">{editCare.districtNurse || 'Not Recorded'}</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">{editCare.districtNurse || 'Not Recorded'}</p>
                         )}
                     </div>
 
                     <div>
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Social Worker</label>
                         {isEditingCare ? (
-                            <input type="text" value={editCare.socialWorker} onChange={(e) => setEditCare({...editCare, socialWorker: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" placeholder="Name & Phone" />
+                            <input type="text" value={editCare.socialWorker} onChange={(e) => setEditCare({...editCare, socialWorker: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900" placeholder="Name & Phone" />
                         ) : (
-                            <p className="text-sm font-bold text-slate-900 mt-1">{editCare.socialWorker || 'Not Recorded'}</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">{editCare.socialWorker || 'Not Recorded'}</p>
                         )}
                     </div>
 
                     <div className="md:col-span-2">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Communication Needs</label>
                         {isEditingCare ? (
-                            <textarea value={editCare.communicationNeeds} onChange={(e) => setEditCare({...editCare, communicationNeeds: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 min-h-[80px]" placeholder="e.g. Hard of hearing, uses communication board..." />
+                            <textarea value={editCare.communicationNeeds} onChange={(e) => setEditCare({...editCare, communicationNeeds: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 min-h-[80px]" placeholder="e.g. Hard of hearing, uses communication board..." />
                         ) : (
-                            <p className="text-sm font-medium text-slate-700 mt-2">{editCare.communicationNeeds || 'No specific communication needs recorded.'}</p>
+                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mt-2">{editCare.communicationNeeds || 'No specific communication needs recorded.'}</p>
                         )}
                     </div>
                     <div className="md:col-span-2">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Continence Details</label>
                         {isEditingCare ? (
-                            <textarea value={editCare.continenceDetails} onChange={(e) => setEditCare({...editCare, continenceDetails: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 min-h-[80px]" placeholder="e.g. Incontinent of urine, uses size M pads..." />
+                            <textarea value={editCare.continenceDetails} onChange={(e) => setEditCare({...editCare, continenceDetails: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 min-h-[80px]" placeholder="e.g. Incontinent of urine, uses size M pads..." />
                         ) : (
-                            <p className="text-sm font-medium text-slate-700 mt-2">{editCare.continenceDetails || 'No continence details recorded.'}</p>
+                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mt-2">{editCare.continenceDetails || 'No continence details recorded.'}</p>
                         )}
                     </div>
                     <div className="md:col-span-2">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cognition / Mental State</label>
                         {isEditingCare ? (
-                            <textarea value={editCare.cognitionSummary} onChange={(e) => setEditCare({...editCare, cognitionSummary: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 min-h-[80px]" placeholder="e.g. Diagnosed with dementia, can get confused in the evenings..." />
+                            <textarea value={editCare.cognitionSummary} onChange={(e) => setEditCare({...editCare, cognitionSummary: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 min-h-[80px]" placeholder="e.g. Diagnosed with dementia, can get confused in the evenings..." />
                         ) : (
-                            <p className="text-sm font-medium text-slate-700 mt-2">{editCare.cognitionSummary || 'No cognitive summary recorded.'}</p>
+                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mt-2">{editCare.cognitionSummary || 'No cognitive summary recorded.'}</p>
                         )}
                     </div>
 
-                    <div className="md:col-span-2 border-t border-slate-100 pt-6 mt-2">
+                    <div className="md:col-span-2 border-t border-slate-100 dark:border-slate-800 pt-6 mt-2">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 block">Sensory & Physical Needs</label>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <label className="text-[9px] font-bold text-slate-400 uppercase">Vision</label>
                                 {isEditingCare ? (
-                                    <textarea rows={2} value={editCare.vision} onChange={(e) => setEditCare({...editCare, vision: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs font-medium border p-3" placeholder="e.g. Wears glasses for reading" />
+                                    <textarea rows={2} value={editCare.vision} onChange={(e) => setEditCare({...editCare, vision: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 border p-3" placeholder="e.g. Wears glasses for reading" />
                                 ) : (
-                                    <p className="text-sm font-medium text-slate-900 mt-1">{editCare.vision || 'No issues recorded'}</p>
+                                    <p className="text-sm font-medium text-slate-900 dark:text-white mt-1">{editCare.vision || 'No issues recorded'}</p>
                                 )}
                             </div>
                             <div>
                                 <label className="text-[9px] font-bold text-slate-400 uppercase">Hearing</label>
                                 {isEditingCare ? (
-                                    <textarea rows={2} value={editCare.hearing} onChange={(e) => setEditCare({...editCare, hearing: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs font-medium border p-3" placeholder="e.g. Left hearing aid" />
+                                    <textarea rows={2} value={editCare.hearing} onChange={(e) => setEditCare({...editCare, hearing: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 border p-3" placeholder="e.g. Left hearing aid" />
                                 ) : (
-                                    <p className="text-sm font-medium text-slate-900 mt-1">{editCare.hearing || 'No issues recorded'}</p>
+                                    <p className="text-sm font-medium text-slate-900 dark:text-white mt-1">{editCare.hearing || 'No issues recorded'}</p>
                                 )}
                             </div>
                             <div>
                                 <label className="text-[9px] font-bold text-slate-400 uppercase">Oral Care</label>
                                 {isEditingCare ? (
-                                    <textarea rows={2} value={editCare.oralCare} onChange={(e) => setEditCare({...editCare, oralCare: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs font-medium border p-3" placeholder="e.g. Upper dentures" />
+                                    <textarea rows={2} value={editCare.oralCare} onChange={(e) => setEditCare({...editCare, oralCare: e.target.value})} className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 border p-3" placeholder="e.g. Upper dentures" />
                                 ) : (
-                                    <p className="text-sm font-medium text-slate-900 mt-1">{editCare.oralCare || 'Natural teeth'}</p>
+                                    <p className="text-sm font-medium text-slate-900 dark:text-white mt-1">{editCare.oralCare || 'Natural teeth'}</p>
                                 )}
                             </div>
                         </div>
@@ -906,15 +930,15 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
             </section>
 
             {/* Home Environment */}
-            <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #14b8a6' }}>
-                <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Home Environment</h3>
+            <section className="bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #14b8a6' }}>
+                <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Home Environment</h3>
                     {userRole === 'admin' && (!isEditingHome ? (
-                        <button onClick={() => setIsEditingHome(true)} className="px-6 py-3 bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 transition-colors">Edit Home Details</button>
+                        <button onClick={() => setIsEditingHome(true)} className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Edit Home Details</button>
                     ) : (
                         <div className="flex gap-3">
-                            <button onClick={() => setIsEditingHome(false)} className="px-6 py-3 bg-slate-100 text-slate-500 text-[10px] font-black uppercase rounded-xl hover:bg-slate-200">Cancel</button>
-                            <button onClick={handleUpdateHome} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl shadow-lg shadow-emerald-200">Save Changes</button>
+                            <button onClick={() => setIsEditingHome(false)} className="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase border-b-4 border-transparent rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
+                            <button onClick={handleUpdateHome} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl border-b-4 border-emerald-800 dark:border-emerald-900 hover:bg-emerald-700 transition-all active:scale-95">Save Changes</button>
                         </div>
                     ))}
                 </div>
@@ -937,11 +961,11 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                                     type="text" 
                                     value={editHome[item.key]} 
                                     onChange={(e) => setEditHome({...editHome, [item.key]: e.target.value})} 
-                                    className="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900" 
+                                    className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-3 font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900" 
                                     placeholder={item.placeholder}
                                 />
                             ) : (
-                                <p className="text-sm font-bold text-slate-900 mt-1">{editHome[item.key] || 'Not Recorded'}</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">{editHome[item.key] || 'Not Recorded'}</p>
                             )}
                         </div>
                     ))}
@@ -949,15 +973,15 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
             </section>
             
             {/* Clinical & Social History */}
-            <section className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #8b5cf6' }}>
-                <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Clinical & Social History</h3>
+            <section className="bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden" style={{ borderTop: '6px solid #8b5cf6' }}>
+                <div className="px-6 md:px-10 py-6 md:py-8 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Clinical & Social History</h3>
                     {userRole === 'admin' && (!isEditingInfo ? (
-                        <button onClick={() => setIsEditingInfo(true)} className="px-6 py-3 bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 transition-colors">Edit Details</button>
+                        <button onClick={() => setIsEditingInfo(true)} className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Edit Details</button>
                     ) : (
                         <div className="flex gap-3">
-                            <button onClick={() => setIsEditingInfo(false)} className="px-6 py-3 bg-slate-100 text-slate-500 text-[10px] font-black uppercase rounded-xl hover:bg-slate-200">Cancel</button>
-                            <button onClick={handleUpdateClinicalInfo} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl shadow-lg shadow-emerald-200">Save Changes</button>
+                            <button onClick={() => setIsEditingInfo(false)} className="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase border-b-4 border-transparent rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
+                            <button onClick={handleUpdateClinicalInfo} className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-xl border-b-4 border-emerald-800 dark:border-emerald-900 hover:bg-emerald-700 transition-all active:scale-95">Save Changes</button>
                         </div>
                     ))}
                 </div>
@@ -966,17 +990,17 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                         <div className="space-y-4">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Previous Medical History (PMH)</label>
                             {isEditingInfo ? (
-                                <textarea className="w-full bg-white border-slate-300 rounded-2xl p-4 font-medium text-slate-700 h-32 focus:ring-2 focus:ring-blue-500/20 outline-none border" value={editInfo.pmh} onChange={(e) => setEditInfo({...editInfo, pmh: e.target.value})} />
+                                <textarea className="w-full bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-2xl p-4 font-medium text-slate-700 dark:text-slate-300 h-32 focus:ring-2 focus:ring-blue-500/20 outline-none border" value={editInfo.pmh} onChange={(e) => setEditInfo({...editInfo, pmh: e.target.value})} />
                             ) : (
-                                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 text-slate-700 font-medium leading-relaxed">{client.pmh && client.pmh.length ? client.pmh.join(', ') : 'No history recorded.'}</div>
+                                <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{client.pmh && client.pmh.length ? client.pmh.join(', ') : 'No history recorded.'}</div>
                             )}
                         </div>
                         <div className="space-y-4">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Hobbies & Interests</label>
                             {isEditingInfo ? (
-                                <input type="text" className="w-full bg-white border-slate-300 rounded-2xl p-4 font-medium text-slate-700 focus:ring-2 focus:ring-blue-500/20 outline-none border" value={editInfo.hobbies} onChange={(e) => setEditInfo({...editInfo, hobbies: e.target.value})} placeholder="e.g. Reading, Knitting" />
+                                <input type="text" className="w-full bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-2xl p-4 font-medium text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-blue-500/20 outline-none border" value={editInfo.hobbies} onChange={(e) => setEditInfo({...editInfo, hobbies: e.target.value})} placeholder="e.g. Reading, Knitting" />
                             ) : (
-                                <div className="flex flex-wrap gap-2">{client.social?.hobbies && client.social.hobbies.length > 0 ? client.social.hobbies.map(h => <span key={h} className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold border border-indigo-100">{h}</span>) : <span className="text-sm font-bold text-slate-400">Not Recorded</span>}</div>
+                                <div className="flex flex-wrap gap-2">{client.social?.hobbies && client.social.hobbies.length > 0 ? client.social.hobbies.map(h => <span key={h} className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 rounded-lg text-xs font-bold border border-indigo-100 dark:border-indigo-800/30">{h}</span>) : <span className="text-sm font-bold text-slate-400">Not Recorded</span>}</div>
                             )}
                         </div>
                     </div>
@@ -984,42 +1008,42 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
                         <div className="space-y-4">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Likes</label>
                             {isEditingInfo ? (
-                                <textarea className="w-full bg-white border-slate-300 rounded-2xl p-4 font-medium text-slate-700 h-24 focus:ring-2 focus:ring-blue-500/20 outline-none border" value={editInfo.likes} onChange={(e) => setEditInfo({...editInfo, likes: e.target.value})} placeholder="e.g. Cup of tea on arrival, classical music..." />
+                                <textarea className="w-full bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-2xl p-4 font-medium text-slate-700 dark:text-slate-300 h-24 focus:ring-2 focus:ring-blue-500/20 outline-none border" value={editInfo.likes} onChange={(e) => setEditInfo({...editInfo, likes: e.target.value})} placeholder="e.g. Cup of tea on arrival, classical music..." />
                             ) : (
-                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-slate-700 font-medium leading-relaxed">{editInfo.likes || 'Not recorded.'}</div>
+                                <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{editInfo.likes || 'Not recorded.'}</div>
                             )}
                         </div>
                         <div className="space-y-4">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Dislikes</label>
                             {isEditingInfo ? (
-                                <textarea className="w-full bg-white border-slate-300 rounded-2xl p-4 font-medium text-slate-700 h-24 focus:ring-2 focus:ring-blue-500/20 outline-none border" value={editInfo.dislikes} onChange={(e) => setEditInfo({...editInfo, dislikes: e.target.value})} placeholder="e.g. Loud noises, being rushed..." />
+                                <textarea className="w-full bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-2xl p-4 font-medium text-slate-700 dark:text-slate-300 h-24 focus:ring-2 focus:ring-blue-500/20 outline-none border" value={editInfo.dislikes} onChange={(e) => setEditInfo({...editInfo, dislikes: e.target.value})} placeholder="e.g. Loud noises, being rushed..." />
                             ) : (
-                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-slate-700 font-medium leading-relaxed">{editInfo.dislikes || 'Not recorded.'}</div>
+                                <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{editInfo.dislikes || 'Not recorded.'}</div>
                             )}
                         </div>
                     </div>
                     <div className="space-y-4">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">"My Life Story" (Background Narrative)</label>
                         {isEditingInfo ? (
-                            <textarea className="w-full bg-white border-slate-300 rounded-2xl p-4 font-medium text-slate-700 h-48 focus:ring-2 focus:ring-blue-500/20 outline-none leading-relaxed border" value={editInfo.lifeStory} onChange={(e) => setEditInfo({...editInfo, lifeStory: e.target.value})} />
+                            <textarea className="w-full bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-2xl p-4 font-medium text-slate-700 dark:text-slate-300 h-48 focus:ring-2 focus:ring-blue-500/20 outline-none leading-relaxed border" value={editInfo.lifeStory} onChange={(e) => setEditInfo({...editInfo, lifeStory: e.target.value})} />
                         ) : (
-                            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 text-slate-700 font-medium leading-relaxed italic">"{client.social?.lifeStory || 'No life story recorded.'}"</div>
+                            <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium leading-relaxed italic">"{client.social?.lifeStory || 'No life story recorded.'}"</div>
                         )}
                     </div>
                     <div className="space-y-4">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">"What's Important to Me"</label>
                         {isEditingInfo ? (
-                            <textarea className="w-full bg-white border-slate-300 rounded-2xl p-4 font-medium text-slate-700 h-32 focus:ring-2 focus:ring-blue-500/20 outline-none leading-relaxed border" value={editInfo.importantToMe} onChange={(e) => setEditInfo({...editInfo, importantToMe: e.target.value})} placeholder="e.g. Seeing my grandchildren, being able to sit in the garden..." />
+                            <textarea className="w-full bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-2xl p-4 font-medium text-slate-700 dark:text-slate-300 h-32 focus:ring-2 focus:ring-blue-500/20 outline-none leading-relaxed border" value={editInfo.importantToMe} onChange={(e) => setEditInfo({...editInfo, importantToMe: e.target.value})} placeholder="e.g. Seeing my grandchildren, being able to sit in the garden..." />
                         ) : (
-                            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 text-slate-700 font-medium leading-relaxed italic">"{editInfo.importantToMe || 'Not recorded.'}"</div>
+                            <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium leading-relaxed italic">"{editInfo.importantToMe || 'Not recorded.'}"</div>
                         )}
                     </div>
                     <div className="space-y-4">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Typical Daily Routine</label>
                         {isEditingInfo ? (
-                            <textarea className="w-full bg-white border-slate-300 rounded-2xl p-4 font-medium text-slate-700 h-32 focus:ring-2 focus:ring-blue-500/20 outline-none leading-relaxed border" value={editInfo.dailyRoutine} onChange={(e) => setEditInfo({...editInfo, dailyRoutine: e.target.value})} placeholder="e.g. Wakes at 8am, breakfast at 9am..." />
+                            <textarea className="w-full bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded-2xl p-4 font-medium text-slate-700 dark:text-slate-300 h-32 focus:ring-2 focus:ring-blue-500/20 outline-none leading-relaxed border" value={editInfo.dailyRoutine} onChange={(e) => setEditInfo({...editInfo, dailyRoutine: e.target.value})} placeholder="e.g. Wakes at 8am, breakfast at 9am..." />
                         ) : (
-                            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 text-slate-700 font-medium leading-relaxed">{editInfo.dailyRoutine || 'No routine recorded.'}</div>
+                            <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{editInfo.dailyRoutine || 'No routine recorded.'}</div>
                         )}
                     </div>
                 </div>
@@ -1027,13 +1051,13 @@ const ClientInformationView = ({ client, onUpdateClient, userRole, availableGrou
 
             {/* CONFIRMATION MODAL - Local to this component */}
             {confirmModal.isOpen && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/20 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white rounded-[2rem] p-8 max-w-md w-full shadow-2xl border border-slate-100 animate-in zoom-in-95">
-                        <h3 className="text-xl font-black text-slate-900 mb-2">{confirmModal.title}</h3>
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/20 dark:bg-slate-900/80 backdrop-blur-sm animate-in fade-in">
+                    <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 max-w-md w-full shadow-2xl border border-slate-100 dark:border-slate-800 animate-in zoom-in-95">
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">{confirmModal.title}</h3>
                         <p className="text-slate-500 font-medium mb-8 leading-relaxed">{confirmModal.message}</p>
                         <div className="flex gap-3">
-                            <button onClick={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))} className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">Cancel</button>
-                            <button onClick={() => { confirmModal.onConfirm(); setConfirmModal(prev => ({ ...prev, isOpen: false })); }} className="flex-1 py-4 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">Confirm Save</button>
+                            <button onClick={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-b-4 border-transparent rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Cancel</button>
+                            <button onClick={() => { confirmModal.onConfirm(); setConfirmModal(prev => ({ ...prev, isOpen: false })); }} className="flex-1 py-4 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest border-b-4 border-blue-800 dark:border-blue-900 hover:bg-blue-700 transition-all active:scale-95">Confirm Save</button>
                         </div>
                     </div>
                 </div>

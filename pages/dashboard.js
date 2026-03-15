@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Users, Calendar, CreditCard, BarChart3, Pill, Layers, ArrowRight } from 'lucide-react';
 
-import ActivityChart from '../components/ActivityChart';
 import ThemeToggle from '../components/ThemeToggle';
 
 const initialModules = [
@@ -69,20 +68,10 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      <div className="py-10">
-        <header>
-          <div className="mx-auto max-w-[100rem] px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">Dashboard</h1>
-          </div>
-        </header>
+      <div className="py-8">
         <main>
           <div className="mx-auto max-w-[100rem] sm:px-6 lg:px-8">
-            <div className="px-4 py-8 sm:px-0">
-              {/* New Chart Widget */}
-              <div className="mb-8">
-                <ActivityChart />
-              </div>
-
+            <div className="px-4 sm:px-0">
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {modules.map((module) => (
                   <div 

@@ -30,7 +30,7 @@ const ThemeToggle = ({ className = "", collapsed = false }) => {
   return (
     <button
       onClick={toggleTheme}
-      className={`flex items-center justify-center p-3 rounded-xl transition-all duration-300 ${isDark ? 'bg-slate-800 text-amber-400 shadow-lg shadow-slate-900/50 border border-slate-700' : 'bg-white text-slate-400 border border-slate-200 shadow-sm hover:text-amber-500'} ${className}`}
+      className={`flex items-center justify-center p-3 rounded-xl transition-all duration-300 active:scale-95 ${isDark ? 'bg-slate-800 text-amber-400 border-b-4 border-slate-900' : 'bg-white text-slate-400 border-b-4 border-slate-200 hover:text-amber-500'} ${className}`}
       title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
     >
       {isDark ? <Sun size={20} strokeWidth={2.5} /> : <Moon size={20} strokeWidth={2.5} />}

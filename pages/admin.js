@@ -196,15 +196,15 @@ export default function AdminDashboard() {
                 onClick={() => setIsEditing(!isEditing)}
                 className={`rounded-xl px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 ${
                   isEditing
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200 hover:bg-emerald-700'
-                    : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                    ? 'bg-emerald-600 text-white border-b-4 border-emerald-800 dark:border-emerald-900 hover:bg-emerald-700'
+                    : 'bg-white dark:bg-slate-800 border-b-4 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
                 }`}
               >
                 {isEditing ? 'Done Editing' : 'Edit Layout'}
               </button>
               <button
                 onClick={handleAddModule}
-                className="rounded-xl bg-blue-600 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2 group"
+                className="rounded-xl bg-blue-600 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white border-b-4 border-blue-800 dark:border-blue-900 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2 group"
               >
                 <Plus size={14} className="transition-transform duration-300 group-hover:rotate-90" /> Add New Module
               </button>

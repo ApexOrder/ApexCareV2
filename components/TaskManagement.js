@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Trash2, ClipboardList } from 'lucide-react';
+import { Check, Trash2, ClipboardList, Pill, Coffee, Home, Heart, AlertOctagon, Info, User } from 'lucide-react';
 
 const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
   const [taskSearch, setTaskSearch] = useState('');
@@ -58,21 +58,21 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tighter leading-none mb-3">Daily Care Tasks</h2>
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter leading-none mb-3">Daily Care Tasks</h2>
           <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Routine & Medication Adherence</p>
         </div>
       </div>
 
       {/* Add Task Form */}
       {userRole === 'admin' && (
-      <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm mb-8" style={{ borderTop: '6px solid #3b82f6' }}>
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm mb-8" style={{ borderTop: '6px solid #3b82f6' }}>
         <div className="flex flex-col gap-4">
             <div className="flex flex-col md:flex-row gap-4 items-start">
             <div className="flex-1 relative w-full">
                 <input 
                   type="text" 
                   placeholder="Search or type custom task..." 
-                  className="w-full bg-slate-50 border-slate-200 rounded-xl p-4 font-bold text-slate-700 outline-none border focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl p-4 font-bold text-slate-700 dark:text-slate-200 outline-none border focus:ring-2 focus:ring-blue-500/20"
                   value={taskSearch}
                   onChange={(e) => {
                       setTaskSearch(e.target.value);
@@ -83,19 +83,19 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
                   onKeyDown={(e) => e.key === 'Enter' && handleAddTask(taskSearch)}
                 />
                 {showTaskDropdown && (
-                    <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                    <div className="absolute z-10 w-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-60 overflow-y-auto">
                         {Object.entries(predefinedTasks).map(([category, items]) => {
                             const filteredItems = items.filter(i => i.toLowerCase().includes(taskSearch.toLowerCase()));
                             if (filteredItems.length === 0) return null;
                             return (
                                 <div key={category}>
-                                    <div className="px-4 py-2 bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest sticky top-0 border-b border-slate-100">
+                                    <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-widest sticky top-0 border-b border-slate-100 dark:border-slate-700">
                                         {category}
                                     </div>
                                     {filteredItems.map(item => (
                                         <button
                                             key={item}
-                                            className="w-full text-left px-4 py-3 hover:bg-blue-50 text-sm font-bold text-slate-700 transition-colors border-b border-slate-50 last:border-0"
+                                            className="w-full text-left px-4 py-3 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-sm font-bold text-slate-700 dark:text-slate-300 transition-colors border-b border-slate-50 dark:border-slate-800 last:border-0"
                                             onMouseDown={() => {
                                                 setTaskSearch(item);
                                                 setShowTaskDropdown(false);
@@ -109,7 +109,7 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
                         })}
                         {taskSearch && !Object.values(predefinedTasks).flat().some(i => i.toLowerCase() === taskSearch.toLowerCase()) && (
                             <button
-                                className="w-full text-left px-4 py-3 hover:bg-blue-50 text-sm font-bold text-blue-600 transition-colors border-t border-slate-100"
+                                className="w-full text-left px-4 py-3 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-sm font-bold text-blue-600 dark:text-blue-400 transition-colors border-t border-slate-100 dark:border-slate-800"
                                 onMouseDown={() => setShowTaskDropdown(false)}
                             >
                                 Use custom: "{taskSearch}"
@@ -120,7 +120,7 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
             </div>
             <div className="flex flex-col gap-2 min-w-[140px]">
                 <select
-                  className="bg-slate-50 border-slate-200 rounded-xl p-4 font-bold text-slate-700 outline-none border focus:ring-2 focus:ring-blue-500/20 w-full"
+                  className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl p-4 font-bold text-slate-700 dark:text-slate-200 outline-none border focus:ring-2 focus:ring-blue-500/20 w-full"
                   value={['Morning', 'Afternoon', 'Evening', 'Anytime'].includes(newTaskTime) ? newTaskTime : 'Specific'}
                   onChange={(e) => {
                       if (e.target.value === 'Specific') {
@@ -139,7 +139,7 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
                 {!['Morning', 'Afternoon', 'Evening', 'Anytime'].includes(newTaskTime) && (
                     <input 
                         type="time"
-                        className="bg-slate-50 border-slate-200 rounded-xl p-4 font-bold text-slate-700 outline-none border focus:ring-2 focus:ring-blue-500/20 w-full"
+                        className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl p-4 font-bold text-slate-700 dark:text-slate-200 outline-none border focus:ring-2 focus:ring-blue-500/20 w-full"
                         value={newTaskTime}
                         onChange={(e) => setNewTaskTime(e.target.value)}
                     />
@@ -147,10 +147,10 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
             </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between border-t border-slate-100 pt-4">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
                 <div className="flex flex-col md:flex-row gap-4 items-center w-full md:w-auto">
                     <select
-                        className="w-full md:w-auto bg-slate-50 border-slate-200 rounded-xl p-3 font-bold text-slate-700 outline-none border focus:ring-2 focus:ring-blue-500/20 text-sm"
+                        className="w-full md:w-auto bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl p-3 font-bold text-slate-700 dark:text-slate-200 outline-none border focus:ring-2 focus:ring-blue-500/20 text-sm"
                         value={newTaskFrequency}
                         onChange={(e) => setNewTaskFrequency(e.target.value)}
                     >
@@ -171,7 +171,7 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
                                             setNewTaskDays([...newTaskDays, day]);
                                         }
                                     }}
-                                    className={`px-3 py-2 rounded-lg text-[10px] font-black uppercase border transition-colors ${newTaskDays.includes(day) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-400 border-slate-200 hover:border-blue-400'}`}
+                                    className={`px-3 py-2 rounded-lg text-[10px] font-black uppercase border transition-colors ${newTaskDays.includes(day) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600'}`}
                                 >
                                     {day}
                                 </button>
@@ -182,7 +182,7 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
 
             <button 
               onClick={() => handleAddTask(taskSearch)}
-              className="w-full md:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95 hover:bg-blue-700"
+              className="w-full md:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border-b-4 border-blue-800 dark:border-blue-900 transition-all active:scale-95 hover:bg-blue-700"
             >
               Add Task
             </button>
@@ -220,27 +220,27 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
                  <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest pl-2">{period}</h3>
                  <div className="space-y-3">
                     {timeTasks.map(task => (
-                       <div key={task.id} className={`group flex items-center gap-4 p-4 rounded-2xl border transition-all ${task.isCompleted ? 'bg-emerald-50 border-emerald-200 opacity-75' : 'bg-white border-slate-200 shadow-sm'}`}>
+                       <div key={task.id} className={`group flex items-center gap-4 p-4 rounded-2xl border transition-all ${task.isCompleted ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/30 opacity-75' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm'}`}>
                           <button 
                             onClick={() => handleToggleTask(task.id)}
-                            className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors ${task.isCompleted ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 hover:border-blue-500'}`}
+                            className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors ${task.isCompleted ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-600 hover:border-blue-500'}`}
                           >
                             {task.isCompleted && <Check size={14} />}
                           </button>
-                          <span className={`flex-1 font-bold ${task.isCompleted ? 'text-emerald-700 line-through' : 'text-slate-700'}`}>
+                          <span className={`flex-1 font-bold ${task.isCompleted ? 'text-emerald-700 dark:text-emerald-500 line-through' : 'text-slate-700 dark:text-slate-300'}`}>
                               {!['Morning', 'Afternoon', 'Evening', 'Anytime'].includes(task.timeOfDay) && (
-                                  <span className="mr-2 px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] rounded-lg border border-blue-100">{task.timeOfDay}</span>
+                                  <span className="mr-2 px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] rounded-lg border border-blue-100 dark:border-blue-800">{task.timeOfDay}</span>
                               )}
                               {task.description}
                               {task.frequency === 'Specific Days' && task.days && (
                                   <span className="ml-2 inline-flex items-center gap-1">
                                       {task.days.map(d => (
-                                          <span key={d} className="px-1.5 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-black uppercase rounded border border-slate-200">{d}</span>
+                                          <span key={d} className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[9px] font-black uppercase rounded border border-slate-200 dark:border-slate-700">{d}</span>
                                       ))}
                                   </span>
                               )}
                               {task.frequency === 'One-off' && (
-                                  <span className="ml-2 px-1.5 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-black uppercase rounded border border-slate-200">One-off</span>
+                                  <span className="ml-2 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[9px] font-black uppercase rounded border border-slate-200 dark:border-slate-700">One-off</span>
                               )}
                           </span>
                           {userRole === 'admin' && (
@@ -258,7 +258,7 @@ const TaskManagement = ({ tasks, onUpdateTasks, userRole }) => {
             );
          })}
          {tasks.length === 0 && (
-            <div className="col-span-full py-20 flex flex-col items-center justify-center bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
+            <div className="col-span-full py-20 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-800/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-700">
                <ClipboardList size={48} className="mb-4 text-slate-300" />
                <p className="text-sm font-black text-slate-400 uppercase tracking-widest">No tasks scheduled</p>
             </div>

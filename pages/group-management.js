@@ -45,7 +45,7 @@ export default function GroupManagement() {
             <h1 className="text-3xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">Group Management</h1>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="rounded-xl bg-blue-600 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95"
+              className="rounded-xl bg-blue-600 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white border-b-4 border-blue-800 dark:border-blue-900 hover:bg-blue-700 transition-all active:scale-95"
             >
               {showForm ? 'Cancel' : 'Create Group'}
             </button>
@@ -82,7 +82,7 @@ export default function GroupManagement() {
                       </div>
                     </div>
                     <div className="flex justify-end">
-                      <button type="submit" className="ml-3 inline-flex justify-center rounded-xl border border-transparent bg-blue-600 py-3 px-6 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-blue-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all active:scale-95">
+                      <button type="submit" className="ml-3 inline-flex justify-center rounded-xl border-b-4 border-blue-800 dark:border-blue-900 bg-blue-600 py-3 px-6 text-[10px] font-black uppercase tracking-widest text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all active:scale-95">
                         Save Group
                       </button>
                     </div>
