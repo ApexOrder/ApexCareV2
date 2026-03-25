@@ -11,7 +11,8 @@ export function getDb() {
       serviceUsers: [],
       visits: [],
       tasks: [],
-      groups: []
+      groups: [],
+      timeline_events: []
     };
     fs.writeFileSync(DB_PATH, JSON.stringify(initialData, null, 2));
     return initialData;
@@ -27,7 +28,8 @@ export function getDb() {
       serviceUsers: [],
       visits: [],
       tasks: [],
-      groups: []
+      groups: [],
+      timeline_events: []
     };
   }
 }

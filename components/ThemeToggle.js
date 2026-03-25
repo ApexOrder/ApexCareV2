@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 
-const ThemeToggle = ({ className = "", collapsed = false }) => {
+const ThemeToggle = ({ className = "", collapsed = false, isSidebar = false }) => {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const ThemeToggle = ({ className = "", collapsed = false }) => {
       title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
     >
       {isDark ? <Sun size={20} strokeWidth={2.5} /> : <Moon size={20} strokeWidth={2.5} />}
-      {!collapsed && <span className="ml-3 font-bold text-xs uppercase tracking-widest lg:hidden lg:group-hover:inline transition-all">{isDark ? 'Light Mode' : 'Dark Mode'}</span>}
+      {!collapsed && <span className={`font-bold text-xs uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${isSidebar ? 'ml-3 lg:ml-0 lg:opacity-0 lg:-translate-x-2 lg:group-hover:opacity-100 lg:group-hover:translate-x-0' : 'ml-3 lg:hidden'}`}>{isDark ? 'Light Mode' : 'Dark Mode'}</span>}
     </button>
   );
 };

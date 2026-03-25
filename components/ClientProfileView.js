@@ -311,11 +311,14 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
 
   return (
     <div className="flex flex-col lg:flex-row h-auto lg:h-screen bg-slate-50 dark:bg-slate-950 overflow-y-auto lg:overflow-hidden">
+      {/* MANAGEMENT SUB-NAVBAR SPACER (Desktop) */}
+      <div className="hidden lg:block w-24 shrink-0 z-[100]"></div>
+
       {/* MANAGEMENT SUB-NAVBAR */}
-      <div className="w-full lg:w-24 group hover:lg:w-72 bg-white dark:bg-slate-900 border-r border-l border-slate-200 dark:border-slate-800 flex flex-col h-auto lg:h-full shadow-2xl z-[110] shrink-0 transition-all duration-300 ease-in-out">
-        <div className="p-4 lg:group-hover:p-6 md:lg:group-hover:p-8 border-b border-slate-200 dark:border-slate-800 flex flex-col items-center transition-all">
+      <div className="w-full lg:w-24 group hover:lg:w-72 bg-white dark:bg-slate-900 border-r border-l border-slate-200 dark:border-slate-800 flex flex-col h-auto lg:h-full lg:fixed lg:top-0 lg:left-0 lg:bottom-0 shadow-2xl z-[120] shrink-0 transition-[width] duration-300 ease-in-out overflow-hidden">
+        <div className="p-4 lg:p-6 border-b border-slate-200 dark:border-slate-800 flex flex-col items-center transition-all">
           <div className="relative mb-4 cursor-pointer" onClick={() => userRole === 'admin' && fileInputRef.current?.click()}>
-             <img src={client.profileImage || `https://picsum.photos/seed/${client.id}/120/120`} className="w-16 h-16 lg:group-hover:w-20 lg:group-hover:h-20 rounded-[1.5rem] lg:group-hover:rounded-[2rem] object-cover shadow-2xl border-4 border-white transition-all" alt="" />
+             <img src={client.profileImage || `https://picsum.photos/seed/${client.id}/120/120`} className="w-16 h-16 lg:w-12 lg:h-12 lg:group-hover:w-20 lg:group-hover:h-20 rounded-[1.5rem] lg:group-hover:rounded-[2rem] object-cover shadow-2xl border-4 border-white transition-all duration-300" alt="" />
              {userRole === 'admin' && (
                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <span className="text-[10px] font-black text-slate-700 bg-white/90 px-2 py-1 rounded-lg backdrop-blur-sm uppercase tracking-widest shadow-sm">Edit</span>
@@ -338,24 +341,24 @@ const ClientProfileView = ({ client, areas, onUpdateClient, onBack, onDirtyState
           </button>
         </div>
 
-        <nav className="flex-1 overflow-x-auto lg:overflow-y-auto p-4 flex flex-row lg:flex-col gap-2 lg:gap-0 lg:space-y-1 scrollbar-hide">
+        <nav className="flex-1 overflow-x-auto lg:overflow-y-auto p-4 flex flex-row lg:flex-col gap-2 lg:gap-0 lg:space-y-2 scrollbar-hide">
           {managementMenu.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveSubTab(item.id)}
-              className={`group/btn w-auto lg:w-full flex items-center lg:justify-center lg:group-hover:justify-start gap-2 lg:gap-0 lg:group-hover:gap-4 px-4 lg:group-hover:px-5 py-2 lg:py-3 text-sm font-bold rounded-2xl transition-all whitespace-nowrap ${
+              className={`group/btn w-auto lg:w-full flex items-center lg:justify-start gap-2 lg:gap-4 px-4 lg:px-5 py-2 lg:py-3 text-sm font-bold rounded-2xl transition-all whitespace-nowrap overflow-hidden ${
                 activeSubTab === item.id 
                   ? 'bg-blue-600 text-white border-b-4 border-blue-800 dark:border-blue-900 active:scale-95' 
                   : 'text-slate-500 dark:text-slate-400 border-b-4 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 active:scale-95'
               }`}
             >
               <span className={`shrink-0 transition-transform duration-300 group-hover/btn:scale-110 group-hover/btn:rotate-6 ${activeSubTab === item.id ? 'text-white' : item.color}`}><item.icon size={20} /></span>
-              <span className="truncate lg:hidden lg:group-hover:inline">{item.id}</span>
+              <span className="truncate transition-all duration-300 lg:opacity-0 lg:-translate-x-2 lg:group-hover:opacity-100 lg:group-hover:translate-x-0">{item.id}</span>
             </button>
           ))}
           
-          <div className="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 w-full">
-             <ThemeToggle className="w-full" />
+          <div className="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 w-full overflow-hidden">
+             <ThemeToggle className="w-full lg:justify-start lg:px-5 lg:gap-4" isSidebar={true} />
           </div>
         </nav>
       </div>
